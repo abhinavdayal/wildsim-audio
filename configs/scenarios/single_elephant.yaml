@@ -1,0 +1,27 @@
+# @package _global_
+defaults:
+  - base_config
+  - environment: forest_clearing
+
+scene_name: "single_elephant_validation"
+description: "Single elephant call for algorithm validation"
+scene_duration: 8.0
+background_noise_level: 35.0
+tags: ["elephant", "validation", "clean"]
+
+sources:
+  - audio_file: "sounds/elephant_adult_male.wav"
+    position: [160.0, -20.0, 0.0]
+    start_time: 7.0
+    volume_scale: 1.1
+    source_type: "elephant"
+
+ambient:
+  forest_base:
+    condition_type: "forest_base"
+    intensity: "medium"
+    level_db: 25.0
+  wind:
+    condition_type: "wind"
+    intensity: 8.0
+    level_db: 22.0

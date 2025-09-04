@@ -1,0 +1,8 @@
+# @package environment
+environment_type: forest_clearing
+room_size: [1000.0, 1000.0, 50.0]
+absorption_coefficient: 0.02
+max_order: 2
+temperature: 25.0
+humidity: 60.0
+air_absorption: true

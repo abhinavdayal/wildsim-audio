@@ -1,0 +1,8 @@
+# @package environment
+environment_type: savanna
+room_size: [2000.0, 2000.0, 100.0]
+absorption_coefficient: 0.01
+max_order: 1
+temperature: 30.0
+humidity: 40.0
+air_absorption: true

@@ -1,0 +1,49 @@
+# @package _global_
+defaults:
+  - base_config
+  - environment: forest_clearing
+
+scene_name: "noisy_challenge_scenario"
+description: "High-noise environment for detection limits testing"
+scene_duration: 20.0
+background_noise_level: 55.0
+tags: ["noisy", "challenge", "detection-limits"]
+
+sources:
+  - audio_file: "sounds/elephant_distant.wav"
+    position: [350.0, 100.0, 0.0]
+    start_time: 5.0
+    volume_scale: 0.8
+    source_type: "elephant"
+  
+  - audio_file: "sounds/truck_passing.wav"
+    position: [120.0, -150.0, 0.0]
+    start_time: 0.0
+    volume_scale: 1.5
+    source_type: "vehicle"
+  
+  - audio_file: "sounds/chainsaw.wav"
+    position: [200.0, 200.0, 0.0]
+    start_time: 8.0
+    volume_scale: 1.2
+    source_type: "machinery"
+  
+  - audio_file: "sounds/bird_chorus.wav"
+    position: [80.0, 120.0, 10.0]
+    start_time: 2.0
+    volume_scale: 0.9
+    source_type: "bird"
+
+ambient:
+  rain:
+    condition_type: "rain"
+    intensity: "moderate"
+    level_db: 40.0
+  wind:
+    condition_type: "wind"
+    intensity: 25.0
+    level_db: 35.0
+  forest_base:
+    condition_type: "forest_base"
+    intensity: "high"
+    level_db: 35.0

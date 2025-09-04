@@ -113,13 +113,14 @@ def convert_hydra_to_pydantic(hydra_config: DictConfig) -> SimulationConfig:
                 source_data['source_type'] = SourceType(source_data['source_type'])
             sources.append(SoundSource(**source_data))
     
-    # Convert ambient conditions
-    ambient = []
-    if 'ambient' in hydra_config:
-        for condition_name, condition_data in hydra_config.ambient.items():
-            ambient_dict = dict(condition_data)
-            ambient_dict['name'] = condition_name
-            ambient.append(AmbientCondition(**ambient_dict))
+    # Convert ambient conditions - Pydantic expects Dict[str, AmbientCondition] but default YAML has []
+    ambient = {}
+    if 'ambient' in hydra_config and hydra_config.ambient:
+        if isinstance(hydra_config.ambient, dict):
+            for condition_name, condition_data in hydra_config.ambient.items():
+                ambient_dict = dict(condition_data)
+                ambient_dict['name'] = condition_name
+                ambient[condition_name] = AmbientCondition(**ambient_dict)
     
     # Build main config
     config_dict = {
@@ -628,7 +629,7 @@ def run_simulation(cfg: DictConfig) -> None:
         print(f"  Scene: {config.scene_name}")
         print(f"  Duration: {config.scene_duration}s")
         print(f"  Sources: {config.total_sources}")
-        print(f"  Environment: {config.environment.environment_type.value}")
+        print(f"  Environment: {config.environment.environment_type}")
         
         # Import and run simulation
         from acoustic_scene_generator import WildlifeAcousticSimulator

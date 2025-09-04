@@ -1,0 +1,21 @@
+# Local audio datasets
+datasets:
+  - dataset_name: "Elephant Recordings"
+    source_type: "local"
+    path_or_id: "./sounds/elephants/"
+    audio_extensions: [".wav", ".mp3", ".flac"]
+    metadata_file: "./sounds/elephants/metadata.csv"
+    cache_dir: "./sounds/elephants/"
+  
+  - dataset_name: "Forest Birds"
+    source_type: "local"
+    path_or_id: "./sounds/birds/"
+    audio_extensions: [".wav", ".mp3"]
+    metadata_file: "./sounds/birds/species_info.json"
+    cache_dir: "./sounds/birds/"
+  
+  - dataset_name: "Environmental Sounds"
+    source_type: "local"
+    path_or_id: "./sounds/environment/"
+    audio_extensions: [".wav", ".flac"]
+    cache_dir: "./sounds/environment/"

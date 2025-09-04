@@ -180,7 +180,7 @@ class ForestAcousticEnvironment:
         self.config = config
         self.room = None
         self.sound_library = SoundLibrary()
-        self.ambient_gen = AmbientGenerator(config.sample_rate)
+        self.ambient_gen = AmbientGenerator(config.processing.sample_rate)
         
         self._create_environment()
     
@@ -194,7 +194,7 @@ class ForestAcousticEnvironment:
         
         self.room = pra.ShoeBox(
             env.room_size,
-            fs=self.config.sample_rate,
+            fs=self.config.processing.sample_rate,
             materials=materials,
             max_order=env.max_order,  # Limited reflections for outdoor
             air_absorption=env.air_absorption,
@@ -218,7 +218,7 @@ class ForestAcousticEnvironment:
         
         # Create microphone array
         self.room.add_microphone_array(
-            pra.MicrophoneArray(mic_positions, fs=self.config.sample_rate)
+            pra.MicrophoneArray(mic_positions, fs=self.config.processing.sample_rate)
         )
     
     def add_sound_sources(self) -> List[Dict]:
@@ -229,7 +229,7 @@ class ForestAcousticEnvironment:
             try:
                 # Load audio
                 audio_data, audio_info = self.sound_library.load_audio(
-                    source.audio_file, self.config.sample_rate
+                    source.audio_file, self.config.processing.sample_rate
                 )
                 
                 # Apply volume scaling
@@ -237,7 +237,7 @@ class ForestAcousticEnvironment:
                 
                 # Handle duration
                 if source.duration_override:
-                    target_samples = int(source.duration_override * self.config.sample_rate)
+                    target_samples = int(source.duration_override * self.config.processing.sample_rate)
                     if len(audio_data) > target_samples:
                         audio_data = audio_data[:target_samples]
                     else:
@@ -283,7 +283,7 @@ class ForestAcousticEnvironment:
         mic_signals = self.room.mic_array.signals
         
         # Ensure we have the right duration
-        target_samples = int(self.config.scene_duration * self.config.sample_rate)
+        target_samples = int(self.config.scene_duration * self.config.processing.sample_rate)
         if mic_signals.shape[1] < target_samples:
             # Pad with zeros if too short
             padding = target_samples - mic_signals.shape[1]
@@ -353,8 +353,8 @@ class ForestAcousticEnvironment:
         metadata = {
             'config': {
                 'scene_duration': self.config.scene_duration,
-                'sample_rate': self.config.sample_rate,
-                'frame_size': self.config.frame_size,
+                'sample_rate': self.config.processing.sample_rate,
+                'frame_size': self.config.processing.frame_size,
                 'hop_length': self.config.hop_length,
                 'environment': self.config.environment.__dict__,
                 'background_noise_level': self.config.background_noise_level
@@ -429,7 +429,7 @@ class ForestAcousticEnvironment:
                     tdoas.append({
                         'mic_pair': (j, k),
                         'tdoa_seconds': tdoa,
-                        'tdoa_samples': tdoa * self.config.sample_rate
+                        'tdoa_samples': tdoa * self.config.processing.sample_rate
                     })
             
             ground_truth['source_directions'].append({
@@ -489,13 +489,13 @@ class WildlifeAcousticSimulator:
             [mic.x, mic.y, mic.z] for mic in config.mic_positions
         ]).T
         
-        mic_array = pra.MicrophoneArray(mic_positions, fs=config.sample_rate)
+        mic_array = pra.MicrophoneArray(mic_positions, fs=config.processing.sample_rate)
         
         validation_results = {}
         
         try:
             # MUSIC algorithm
-            music = pra.doa.MUSIC(mic_array, fs=config.sample_rate, nfft=config.frame_size)
+            music = pra.doa.MUSIC(mic_array, fs=config.processing.sample_rate, nfft=config.processing.frame_size)
             music.locate_sources(mic_signals, num_src=len(config.sources))
             
             validation_results['MUSIC'] = {
@@ -507,7 +507,7 @@ class WildlifeAcousticSimulator:
         
         try:
             # SRP-PHAT algorithm (matches your approach)
-            srp = pra.doa.SRP(mic_array, fs=config.sample_rate, nfft=config.frame_size)
+            srp = pra.doa.SRP(mic_array, fs=config.processing.sample_rate, nfft=config.processing.frame_size)
             srp.locate_sources(mic_signals, num_src=len(config.sources))
             
             validation_results['SRP-PHAT'] = {
@@ -519,7 +519,7 @@ class WildlifeAcousticSimulator:
         
         try:
             # FRIDA (Frequency Invariant Beamforming)
-            frida = pra.doa.FRIDA(mic_array, fs=config.sample_rate, nfft=config.frame_size)
+            frida = pra.doa.FRIDA(mic_array, fs=config.processing.sample_rate, nfft=config.processing.frame_size)
             frida.locate_sources(mic_signals, num_src=len(config.sources))
             
             validation_results['FRIDA'] = {
@@ -606,7 +606,7 @@ if __name__ == "__main__":
         print("Wildlife Acoustic Simulation with Pyroomacoustics")
         print("=" * 50)
         print(f"Scene duration: {config.scene_duration}s")
-        print(f"Sample rate: {config.sample_rate} Hz")
+        print(f"Sample rate: {config.processing.sample_rate} Hz")
         print(f"Sources: {len(config.sources)}")
         print(f"Environment: {config.environment.room_size}")
         

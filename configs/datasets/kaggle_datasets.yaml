@@ -1,0 +1,28 @@
+# Audio datasets from Kaggle
+datasets:
+  - dataset_name: "ESC-50"
+    source_type: "kaggle"
+    path_or_id: "karoldvl/esc50-dataset" 
+    audio_extensions: [".wav"]
+    metadata_file: "meta/esc50.csv"
+    cache_dir: "./audio_cache/esc50"
+  
+  - dataset_name: "BirdCLEF-2023"
+    source_type: "kaggle"
+    path_or_id: "competitions/birdclef-2023"
+    audio_extensions: [".ogg", ".mp3"]
+    metadata_file: "train_metadata.csv"
+    cache_dir: "./audio_cache/birdclef2023"
+  
+  - dataset_name: "Freesound Audio Tagging"
+    source_type: "kaggle" 
+    path_or_id: "c/freesound-audio-tagging"
+    audio_extensions: [".wav"]
+    metadata_file: "train.csv"
+    cache_dir: "./audio_cache/freesound"
+
+  - dataset_name: "Animal Sound Classification"
+    source_type: "kaggle"
+    path_or_id: "mmoreaux/audio-cats-and-dogs"
+    audio_extensions: [".wav", ".mp3"]
+    cache_dir: "./audio_cache/animal_sounds"

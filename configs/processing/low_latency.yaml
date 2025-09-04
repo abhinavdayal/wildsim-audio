@@ -1,0 +1,6 @@
+# @package processing
+# Minimal latency configuration
+sample_rate: 16000
+frame_size: 128
+hop_length: 64
+window_type: "hann"
