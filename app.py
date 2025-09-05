@@ -386,15 +386,48 @@ def dataset_manager_page():
                 cache_dir = "./audio_cache"  # Default cache for catalog storage
                 overwrite_cache = False
         
-        # Submit button with validation
+        # Check if dataset already exists
+        dataset_exists = False
+        existing_file_count = 0
+        
+        if dataset_name and dataset_manager:
+            try:
+                # Check if dataset already exists in catalog
+                if dataset_name in dataset_manager.catalog.catalog["datasets"]:
+                    dataset_info = dataset_manager.catalog.catalog["datasets"][dataset_name]
+                    existing_file_count = dataset_info.get("file_count", 0)
+                    dataset_exists = existing_file_count > 0
+            except:
+                pass
+        
+        # Submit button with validation and existing dataset check
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
-            submit = st.button(
-                "🔄 Setup Dataset", 
-                type="primary",
-                use_container_width=True,
-                disabled=not path_or_id or not dataset_name
-            )
+            # Show different button states based on dataset existence
+            if dataset_exists and not overwrite_cache:
+                st.success(f"✅ Dataset '{dataset_name}' already set up with {existing_file_count} files")
+                
+                col_a, col_b = st.columns(2)
+                with col_a:
+                    submit = st.button(
+                        "🔄 Re-setup Dataset", 
+                        type="secondary",
+                        use_container_width=True,
+                        help="Re-process this dataset (will overwrite existing catalog)"
+                    )
+                with col_b:
+                    if st.button("📊 View Summary", type="primary", use_container_width=True):
+                        st.info("💡 Go to the 'Dataset Summary' tab above to view dataset details")
+            else:
+                # Standard setup button
+                button_disabled = not path_or_id or not dataset_name
+                submit = st.button(
+                    "🔄 Setup Dataset", 
+                    type="primary",
+                    use_container_width=True,
+                    disabled=button_disabled,
+                    help="Download and catalog this dataset" if not button_disabled else "Please fill in all required fields"
+                )
             
             if submit:
                 try:
