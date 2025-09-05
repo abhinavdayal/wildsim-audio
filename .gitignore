@@ -208,6 +208,7 @@ __marimo__/
 
 output/
 temp/
+audio_cache/
 *.log
 *.tmp
 *.bak

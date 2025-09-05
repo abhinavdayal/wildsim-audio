@@ -15,11 +15,13 @@ import tempfile
 import zipfile
 from datetime import datetime
 import io
+import time
 
 # Import our modules
 from models import *
 from dataset_manager import DatasetManager, SmartAudioSelector
 from acoustic_scene_generator import WildlifeAcousticSimulator, save_simulation_results
+from auth_helpers import *
 import pyroomacoustics as pra
 
 # Page configuration
@@ -142,42 +144,257 @@ def dataset_manager_page():
     with tab1:
         st.subheader("Add New Dataset")
         
-        # Dataset configuration form
-        with st.form("dataset_form"):
-            col1, col2 = st.columns(2)
+        # Dataset configuration form with dynamic fields
+        dataset_name = st.text_input("Dataset Name", "My Dataset")
+        
+        # Improved source type selection with descriptions
+        source_options = [
+            ("local", "📁 Local - Existing files on your computer"),
+            ("kaggle", "🏆 Kaggle - Download from Kaggle datasets"),
+            ("google_drive", "☁️ Google Drive - Download from Google Drive folder"),
+            ("url", "🌐 URL - Download from direct web link")
+        ]
+        
+        source_type = st.selectbox(
+            "Source Type", 
+            options=[opt[0] for opt in source_options],
+            format_func=lambda x: next(opt[1] for opt in source_options if opt[0] == x),
+            help="Choose where your audio dataset is located"
+        )
+        
+        path_or_id = ""  # Initialize
+        
+        # Dynamic form based on source type
+        if source_type == "kaggle":
+            st.markdown("### 🔑 Kaggle Configuration")
             
+            # Check for Kaggle authentication
+            kaggle_setup = check_kaggle_auth()
+            if not kaggle_setup['authenticated']:
+                st.error("❌ Kaggle authentication not configured")
+                with st.expander("🔧 Setup Kaggle Authentication"):
+                    st.markdown("""
+                    **Steps to configure Kaggle API:**
+                    1. Go to [Kaggle Account Settings](https://www.kaggle.com/settings/account)
+                    2. Scroll to "API" section and click "Create New Token"
+                    3. Download the `kaggle.json` file
+                    4. Place it in one of these locations:
+                       - `~/.kaggle/kaggle.json` (recommended)
+                       - Upload using the button below
+                    """)
+                    
+                    uploaded_kaggle = st.file_uploader(
+                        "Upload kaggle.json", 
+                        type="json",
+                        help="Upload your Kaggle API credentials file"
+                    )
+                    
+                    if uploaded_kaggle:
+                        if setup_kaggle_credentials(uploaded_kaggle):
+                            st.success("✅ Kaggle credentials configured successfully!")
+                            st.rerun()
+                        else:
+                            st.error("❌ Failed to configure Kaggle credentials")
+            else:
+                st.success(f"✅ Kaggle authenticated as: {kaggle_setup['username']}")
+            
+            col1, col2 = st.columns(2)
             with col1:
-                dataset_name = st.text_input("Dataset Name", "My Dataset")
-                source_type = st.selectbox("Source Type", 
-                    ["local", "kaggle", "google_drive", "url"])
+                path_or_id = st.text_input(
+                    "Kaggle Dataset ID", 
+                    placeholder="username/dataset-name",
+                    help="Enter the dataset ID from Kaggle URL (e.g., 'username/dataset-name')"
+                )
                 
-                if source_type == "kaggle":
-                    path_or_id = st.text_input("Kaggle Dataset ID", 
-                        placeholder="username/dataset-name")
-                    st.info("💡 Make sure you have Kaggle API configured")
-                elif source_type == "google_drive":
-                    path_or_id = st.text_input("Google Drive Folder ID",
-                        placeholder="1A2B3C4D5E6F7G8H9I0J")
-                    st.info("💡 Requires Google Drive API setup")
-                elif source_type == "url":
-                    path_or_id = st.text_input("Download URL",
-                        placeholder="https://example.com/dataset.zip")
-                else:  # local
-                    path_or_id = st.text_input("Local Path", 
-                        placeholder="./sounds/dataset/")
+                dataset_type = st.radio(
+                    "Dataset Type",
+                    ["Dataset", "Competition"],
+                    help="Choose whether this is a regular dataset or competition data"
+                )
             
             with col2:
-                audio_extensions = st.multiselect("Audio Extensions", 
-                    [".wav", ".mp3", ".flac", ".m4a", ".ogg"],
-                    default=[".wav", ".mp3"])
+                if st.button("🔍 Browse Kaggle Datasets"):
+                    st.info("Visit [Kaggle Datasets](https://www.kaggle.com/datasets) to find datasets")
                 
-                metadata_file = st.text_input("Metadata File (optional)",
-                    placeholder="metadata.csv")
-                
-                cache_dir = st.text_input("Cache Directory",
-                    value=f"./audio_cache/{dataset_name.lower().replace(' ', '_')}")
+                if path_or_id and kaggle_setup['authenticated']:
+                    if st.button("📊 Preview Dataset Info"):
+                        try:
+                            dataset_info = get_kaggle_dataset_info(path_or_id, dataset_type)
+                            if dataset_info:
+                                st.json(dataset_info)
+                        except Exception as e:
+                            st.error(f"Failed to fetch dataset info: {e}")
+        
+        elif source_type == "google_drive":
+            st.markdown("### 🔑 Google Drive Configuration")
             
-            submit = st.form_submit_button("🔄 Setup Dataset")
+            # Check for Google Drive authentication
+            gdrive_setup = check_gdrive_auth()
+            if not gdrive_setup['authenticated']:
+                st.error("❌ Google Drive authentication not configured")
+                with st.expander("🔧 Setup Google Drive Authentication"):
+                    st.markdown("""
+                    **Steps to configure Google Drive API:**
+                    1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+                    2. Create a new project or select existing one
+                    3. Enable Google Drive API
+                    4. Create credentials (OAuth 2.0 Client ID)
+                    5. Download the credentials JSON file
+                    6. Upload it using the button below
+                    """)
+                    
+                    uploaded_gdrive = st.file_uploader(
+                        "Upload credentials.json", 
+                        type="json",
+                        help="Upload your Google Drive API credentials file"
+                    )
+                    
+                    if uploaded_gdrive:
+                        if setup_gdrive_credentials(uploaded_gdrive):
+                            st.success("✅ Google Drive credentials configured successfully!")
+                            st.rerun()
+                        else:
+                            st.error("❌ Failed to configure Google Drive credentials")
+            else:
+                st.success("✅ Google Drive authenticated")
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                path_or_id = st.text_input(
+                    "Google Drive Folder ID",
+                    placeholder="1A2B3C4D5E6F7G8H9I0J",
+                    help="Extract folder ID from Google Drive URL: https://drive.google.com/drive/folders/FOLDER_ID"
+                )
+                
+                folder_access = st.radio(
+                    "Folder Access",
+                    ["Public/Shared with me", "My Drive"],
+                    help="Specify if folder is shared with you or in your personal drive"
+                )
+            
+            with col2:
+                if path_or_id and gdrive_setup['authenticated']:
+                    if st.button("📁 Preview Folder Contents"):
+                        try:
+                            folder_info = get_gdrive_folder_info(path_or_id)
+                            if folder_info:
+                                st.write(f"**Folder:** {folder_info['name']}")
+                                st.write(f"**Files:** {len(folder_info['files'])}")
+                                with st.expander("View files"):
+                                    for file in folder_info['files'][:20]:  # Show first 20
+                                        st.write(f"- {file['name']} ({file['size']})")
+                        except Exception as e:
+                            st.error(f"Failed to fetch folder info: {e}")
+        
+        elif source_type == "url":
+            st.markdown("### 🌐 URL Download Configuration")
+            col1, col2 = st.columns(2)
+            with col1:
+                path_or_id = st.text_input(
+                    "Download URL",
+                    placeholder="https://example.com/dataset.zip",
+                    help="Enter the direct download URL for the dataset archive"
+                )
+                
+                url_auth_required = st.checkbox(
+                    "Requires Authentication",
+                    help="Check if the URL requires authentication headers"
+                )
+            
+            with col2:
+                if url_auth_required:
+                    auth_header = st.text_input(
+                        "Authorization Header",
+                        type="password",
+                        placeholder="Bearer token123...",
+                        help="Enter authorization header if required"
+                    )
+                
+                if path_or_id:
+                    if st.button("🔍 Test URL"):
+                        if test_url_accessibility(path_or_id):
+                            st.success("✅ URL is accessible")
+                        else:
+                            st.error("❌ URL is not accessible")
+        
+        else:  # local
+            st.markdown("### 📁 Local Path Configuration")
+            st.info("💡 Point to an existing folder with audio files. Files will be cataloged but remain in their original location.")
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                path_or_id = st.text_input(
+                    "Local Directory Path", 
+                    placeholder="./audio_cache/tiny_test",
+                    help="Enter path to local directory containing audio files (absolute or relative path)"
+                )
+            
+            with col2:
+                if st.button("� Check Path"):
+                    if path_or_id and os.path.exists(path_or_id):
+                        # Count audio files specifically
+                        audio_exts = ['.wav', '.mp3', '.flac', '.m4a', '.ogg', '.aiff']
+                        audio_files = []
+                        for ext in audio_exts:
+                            audio_files.extend(list(Path(path_or_id).rglob(f"*{ext}")))
+                        
+                        total_files = len([f for f in Path(path_or_id).rglob("*") if f.is_file()])
+                        st.success(f"✅ Found {len(audio_files)} audio files ({total_files} total files)")
+                        
+                        if audio_files:
+                            with st.expander("📂 Sample audio files"):
+                                for audio_file in audio_files[:5]:  # Show first 5
+                                    st.write(f"🎵 {audio_file.name}")
+                    else:
+                        st.error("❌ Path does not exist")
+                        st.caption("Make sure the path exists and you have read permissions")
+        
+        # Common configuration options
+        st.markdown("### ⚙️ Dataset Configuration")
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            audio_extensions = st.multiselect(
+                "Audio Extensions", 
+                [".wav", ".mp3", ".flac", ".m4a", ".ogg", ".aiff"],
+                default=[".wav", ".mp3"],
+                help="Select which audio file types to include"
+            )
+            
+            metadata_file = st.text_input(
+                "Metadata File (optional)",
+                placeholder="metadata.csv",
+                help="Optional CSV file with audio metadata (filename, duration, labels, etc.)"
+            )
+        
+        with col2:
+            # Only show cache directory for non-local datasets
+            if source_type != "local":
+                cache_dir = st.text_input(
+                    "Cache Directory",
+                    value=f"./audio_cache/{dataset_name.lower().replace(' ', '_')}",
+                    help="Directory where downloaded dataset will be cached locally"
+                )
+                
+                overwrite_cache = st.checkbox(
+                    "Overwrite existing cache",
+                    help="Check to re-download even if dataset exists in cache"
+                )
+            else:
+                # For local datasets, we don't need cache settings
+                st.info("ℹ️ Local datasets are cataloged in place - no caching needed")
+                cache_dir = "./audio_cache"  # Default cache for catalog storage
+                overwrite_cache = False
+        
+        # Submit button with validation
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            submit = st.button(
+                "🔄 Setup Dataset", 
+                type="primary",
+                use_container_width=True,
+                disabled=not path_or_id or not dataset_name
+            )
             
             if submit:
                 try:
@@ -190,14 +407,73 @@ def dataset_manager_page():
                         cache_dir=cache_dir
                     )
                     
-                    with st.spinner(f"Setting up {dataset_name}..."):
-                        success = dataset_manager.setup_dataset(config)
+                    # Initialize progress tracking in session state
+                    if 'dataset_setup_progress' not in st.session_state:
+                        st.session_state.dataset_setup_progress = None
                     
-                    if success:
-                        st.success(f"✅ Successfully setup {dataset_name}")
-                        st.rerun()
-                    else:
-                        st.error(f"❌ Failed to setup {dataset_name}")
+                    # Create a progress container
+                    progress_container = st.container()
+                    
+                    # Start dataset setup with progress tracking
+                    try:
+                        with progress_container:
+                            st.info(f"🔄 Setting up {dataset_name}...")
+                            progress_bar = st.progress(0.0)
+                            status_text = st.empty()
+                            
+                            # Download phase
+                            status_text.text("📥 Downloading dataset...")
+                            progress_bar.progress(0.1)
+                            
+                            # Setup dataset (download only, skip cataloging for now)
+                            success = dataset_manager.setup_dataset_download_only(config)
+                            
+                            if success:
+                                progress_bar.progress(0.5)
+                                status_text.text("📊 Cataloging audio files...")
+                                
+                                # Get file count for progress calculation
+                                dataset_path = Path(config.cache_dir)
+                                audio_files = []
+                                for ext in config.audio_extensions:
+                                    audio_files.extend(list(dataset_path.rglob(f"*{ext}")))
+                                
+                                total_files = len(audio_files)
+                                status_text.text(f"📊 Processing {total_files} audio files...")
+                                
+                                # Process files in chunks to show progress
+                                chunk_size = max(50, total_files // 20)  # Process in ~20 chunks
+                                processed = 0
+                                
+                                for i in range(0, total_files, chunk_size):
+                                    chunk_files = audio_files[i:i+chunk_size]
+                                    
+                                    # Process chunk
+                                    dataset_manager.catalog.process_audio_chunk(chunk_files, config)
+                                    
+                                    processed += len(chunk_files)
+                                    progress = 0.5 + (processed / total_files) * 0.5
+                                    progress_bar.progress(progress)
+                                    status_text.text(f"📊 Processed {processed}/{total_files} files...")
+                                
+                                # Finalize catalog
+                                dataset_manager.catalog.finalize_dataset_catalog(config)
+                                
+                                progress_bar.progress(1.0)
+                                status_text.text("✅ Dataset setup complete!")
+                                
+                                st.success(f"✅ Successfully setup {dataset_name} with {total_files} audio files")
+                                time.sleep(1)  # Brief pause to show completion
+                                st.rerun()
+                            else:
+                                progress_bar.progress(0.0)
+                                status_text.text("❌ Download failed")
+                                st.error(f"❌ Failed to setup {dataset_name}")
+                    
+                    except Exception as e:
+                        st.error(f"❌ Setup error: {e}")
+                        import traceback
+                        st.code(traceback.format_exc())
                         
                 except Exception as e:
                     st.error(f"❌ Configuration error: {e}")
@@ -619,7 +895,7 @@ def configuration_page():
             
             # Configuration JSON
             with st.expander("📄 View Configuration JSON"):
-                config_dict = config.dict()
+                config_dict = config.model_dump()
                 st.json(config_dict)
             
             # Action buttons
@@ -633,7 +909,7 @@ def configuration_page():
             
             with col2:
                 if st.button("📁 Export Configuration"):
-                    config_json = json.dumps(config.dict(), indent=2, default=str)
+                    config_json = json.dumps(config.model_dump(), indent=2, default=str)
                     st.download_button(
                         "Download Config JSON",
                         config_json,
@@ -666,7 +942,8 @@ def simulation_page():
     if st.session_state.current_config is None:
         st.warning("⚠️ No configuration loaded. Please create a configuration first.")
         if st.button("🔧 Go to Configuration"):
-            st.switch_page("config")
+            st.rerun()
+        st.info("👈 Please use the sidebar to navigate to 'Configuration' page.")
         return
     
     config = st.session_state.current_config
@@ -1088,7 +1365,7 @@ def analysis_page():
         
         # Configuration details
         with st.expander("Configuration Used"):
-            st.json(config.dict())
+            st.json(config.model_dump())
         
         # Full metadata
         with st.expander("Simulation Metadata"):
@@ -1260,218 +1537,6 @@ def sidebar_navigation():
     
     selected = st.sidebar.selectbox("Select Page", list(pages.keys()))
     return pages[selected]
-
-def dataset_manager_page():
-    """Dataset management page"""
-    
-    st.markdown('<h2 class="section-header">📊 Dataset Manager</h2>', unsafe_allow_html=True)
-    
-    # Initialize dataset manager
-    if st.session_state.dataset_manager is None:
-        with st.spinner("Initializing dataset manager..."):
-            st.session_state.dataset_manager = DatasetManager()
-    
-    dataset_manager = st.session_state.dataset_manager
-    
-    # Tabs for different dataset operations
-    tab1, tab2, tab3, tab4 = st.tabs(["📥 Add Dataset", "📋 Dataset Summary", "🔍 Browse Files", "⚙️ Settings"])
-    
-    with tab1:
-        st.subheader("Add New Dataset")
-        
-        # Dataset configuration form
-        with st.form("dataset_form"):
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                dataset_name = st.text_input("Dataset Name", "My Dataset")
-                source_type = st.selectbox("Source Type", 
-                    ["local", "kaggle", "google_drive", "url"])
-                
-                if source_type == "kaggle":
-                    path_or_id = st.text_input("Kaggle Dataset ID", 
-                        placeholder="username/dataset-name")
-                    st.info("💡 Make sure you have Kaggle API configured")
-                elif source_type == "google_drive":
-                    path_or_id = st.text_input("Google Drive Folder ID",
-                        placeholder="1A2B3C4D5E6F7G8H9I0J")
-                    st.info("💡 Requires Google Drive API setup")
-                elif source_type == "url":
-                    path_or_id = st.text_input("Download URL",
-                        placeholder="https://example.com/dataset.zip")
-                else:  # local
-                    path_or_id = st.text_input("Local Path", 
-                        placeholder="./sounds/dataset/")
-            
-            with col2:
-                audio_extensions = st.multiselect("Audio Extensions", 
-                    [".wav", ".mp3", ".flac", ".m4a", ".ogg"],
-                    default=[".wav", ".mp3"])
-                
-                metadata_file = st.text_input("Metadata File (optional)",
-                    placeholder="metadata.csv")
-                
-                cache_dir = st.text_input("Cache Directory",
-                    value=f"./audio_cache/{dataset_name.lower().replace(' ', '_')}")
-            
-            submit = st.form_submit_button("🔄 Setup Dataset")
-            
-            if submit:
-                try:
-                    config = DatasetConfig(
-                        dataset_name=dataset_name,
-                        source_type=source_type,
-                        path_or_id=path_or_id,
-                        audio_extensions=audio_extensions,
-                        metadata_file=metadata_file if metadata_file else None,
-                        cache_dir=cache_dir
-                    )
-                    
-                    with st.spinner(f"Setting up {dataset_name}..."):
-                        success = dataset_manager.setup_dataset(config)
-                    
-                    if success:
-                        st.success(f"✅ Successfully setup {dataset_name}")
-                        st.rerun()
-                    else:
-                        st.error(f"❌ Failed to setup {dataset_name}")
-                        
-                except Exception as e:
-                    st.error(f"❌ Configuration error: {e}")
-    
-    with tab2:
-        st.subheader("Dataset Summary")
-        
-        if st.button("🔄 Refresh Summary"):
-            st.rerun()
-        
-        try:
-            summary = dataset_manager.get_dataset_summary()
-            
-            # Overview metrics
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.metric("Total Datasets", summary["total_datasets"])
-            with col2:
-                st.metric("Total Files", summary["total_files"])
-            with col3:
-                total_duration = sum(
-                    file_info.get("duration", 0) 
-                    for file_info in dataset_manager.catalog.catalog["files"].values()
-                )
-                st.metric("Total Duration", f"{total_duration/3600:.1f} hours")
-            
-            # Datasets table
-            if summary["datasets"]:
-                st.subheader("Datasets")
-                df_datasets = pd.DataFrame.from_dict(summary["datasets"], orient="index")
-                st.dataframe(df_datasets, use_container_width=True)
-            
-            # Source type distribution
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                if summary["source_type_counts"]:
-                    st.subheader("Source Types")
-                    fig_sources = px.pie(
-                        values=list(summary["source_type_counts"].values()),
-                        names=list(summary["source_type_counts"].keys()),
-                        title="Distribution by Source Type"
-                    )
-                    st.plotly_chart(fig_sources, use_container_width=True)
-            
-            with col2:
-                if summary["format_counts"]:
-                    st.subheader("Audio Formats")
-                    fig_formats = px.bar(
-                        x=list(summary["format_counts"].keys()),
-                        y=list(summary["format_counts"].values()),
-                        title="Files by Format"
-                    )
-                    st.plotly_chart(fig_formats, use_container_width=True)
-            
-        except Exception as e:
-            st.error(f"Error getting dataset summary: {e}")
-    
-    with tab3:
-        st.subheader("Browse Audio Files")
-        
-        # Filters
-        col1, col2, col3 = st.columns(3)
-        
-        with col1:
-            filter_source_type = st.selectbox("Filter by Source Type", 
-                ["All"] + [t.value for t in SourceType], index=None)
-        
-        with col2:
-            min_duration = st.number_input("Min Duration (s)", 0.0, 300.0, 0.0)
-            max_duration = st.number_input("Max Duration (s)", 0.1, 300.0, 300.0)
-        
-        with col3:
-            filter_dataset = st.selectbox("Filter by Dataset", 
-                ["All"] + list(dataset_manager.catalog.catalog["datasets"].keys()))
-        
-        if st.button("🔍 Search Files"):
-            try:
-                # Apply filters
-                source_filter = None if filter_source_type == "All" else SourceType(filter_source_type)
-                dataset_filter = None if filter_dataset == "All" else filter_dataset
-                
-                matches = dataset_manager.catalog.find_audio_files(
-                    source_type=source_filter,
-                    min_duration=min_duration,
-                    max_duration=max_duration,
-                    dataset_name=dataset_filter
-                )
-                
-                if matches:
-                    st.success(f"Found {len(matches)} matching files")
-                    
-                    # Convert to DataFrame for display
-                    df_files = pd.DataFrame(matches)
-                    
-                    # Select columns to display
-                    display_cols = ["absolute_path", "source_type", "duration", 
-                                   "sample_rate", "format", "dataset"]
-                    available_cols = [col for col in display_cols if col in df_files.columns]
-                    
-                    st.dataframe(df_files[available_cols], use_container_width=True)
-                    
-                    # Audio player for selected file
-                    if len(matches) > 0:
-                        selected_idx = st.selectbox("Select file to preview", 
-                                                   range(len(matches)),
-                                                   format_func=lambda x: f"File {x+1}: {Path(matches[x]['absolute_path']).name}")
-                        
-                        selected_file = matches[selected_idx]["absolute_path"]
-                        if Path(selected_file).exists():
-                            with open(selected_file, "rb") as audio_file:
-                                st.audio(audio_file.read(), format="audio/wav")
-                else:
-                    st.warning("No files match the specified criteria")
-                    
-            except Exception as e:
-                st.error(f"Error searching files: {e}")
-    
-    with tab4:
-        st.subheader("Dataset Settings")
-        
-        cache_dir = st.text_input("Cache Directory", 
-                                 value=str(dataset_manager.cache_dir))
-        
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            if st.button("🧹 Clear Cache"):
-                if st.checkbox("I understand this will delete all cached data"):
-                    # Implementation would go here
-                    st.warning("Cache clearing not implemented in demo")
-        
-        with col2:
-            if st.button("📊 Rebuild Catalog"):
-                with st.spinner("Rebuilding catalog..."):
-                    # Implementation would go here
-                    st.info("Catalog rebuild not implemented in demo")
 
 def configuration_page():
     """Configuration page for creating simulation scenarios"""

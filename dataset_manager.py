@@ -28,47 +28,144 @@ class DatasetDownloader:
         self.cache_dir.mkdir(parents=True, exist_ok=True)
     
     def download_kaggle_dataset(self, dataset_id: str, cache_path: Path) -> bool:
-        """Download dataset from Kaggle"""
+        """Download dataset from Kaggle with improved progress tracking"""
         try:
             import kaggle
+            import time
+            import threading
+            from concurrent.futures import ThreadPoolExecutor, TimeoutError
             
-            print(f"Downloading Kaggle dataset: {dataset_id}")
+            print(f"📥 Starting download of Kaggle dataset: {dataset_id}")
+            
+            # Check if audio files already exist
+            existing_audio_files = []
+            for ext in ['.wav', '.mp3', '.flac', '.ogg', '.m4a']:
+                existing_audio_files.extend(list(cache_path.rglob(f"*{ext}")))
+            
+            if existing_audio_files:
+                print(f"✅ Found {len(existing_audio_files)} existing audio files")
+                print("Skipping download - files already present")
+                return True
+            
+            print(f"📁 Cache directory: {cache_path}")
+            print("No audio files found - proceeding with download")
             
             # Download to temporary location
             temp_dir = cache_path / "temp"
             temp_dir.mkdir(exist_ok=True)
             
-            # Use Kaggle API
-            if "/" in dataset_id:
-                # Regular dataset
-                kaggle.api.dataset_download_files(
-                    dataset_id, 
-                    path=str(temp_dir), 
-                    unzip=True
-                )
-            else:
-                # Competition dataset
-                kaggle.api.competition_download_files(
-                    dataset_id,
-                    path=str(temp_dir),
-                    unzip=True
-                )
+            # Function to run the download
+            def do_download():
+                try:
+                    if "/" in dataset_id:
+                        # Regular dataset
+                        print(f"📦 Downloading regular dataset: {dataset_id}")
+                        kaggle.api.dataset_download_files(
+                            dataset_id, 
+                            path=str(temp_dir), 
+                            unzip=True
+                        )
+                    else:
+                        # Competition dataset
+                        print(f"🏆 Downloading competition dataset: {dataset_id}")
+                        kaggle.api.competition_download_files(
+                            dataset_id,
+                            path=str(temp_dir),
+                            unzip=True
+                        )
+                    return True
+                except Exception as e:
+                    print(f"❌ Download error: {e}")
+                    return False
+            
+            # Run download with timeout and progress monitoring
+            print("⏳ Starting download (this may take several minutes)...")
+            start_time = time.time()
+            
+            # Use ThreadPoolExecutor for timeout control
+            with ThreadPoolExecutor(max_workers=1) as executor:
+                future = executor.submit(do_download)
+                
+                # Monitor progress
+                while not future.done():
+                    elapsed = time.time() - start_time
+                    print(f"📊 Download in progress... {elapsed:.0f}s elapsed")
+                    
+                    # Check if files are appearing
+                    if temp_dir.exists():
+                        temp_files = list(temp_dir.rglob("*"))
+                        if temp_files:
+                            total_size = sum(f.stat().st_size for f in temp_files if f.is_file())
+                            print(f"📁 {len(temp_files)} files, {total_size/1024/1024:.1f}MB downloaded so far")
+                    
+                    time.sleep(10)  # Check every 10 seconds
+                    
+                    # Timeout after 5 minutes for initial testing
+                    if elapsed > 300:
+                        print("⏰ Download timeout (5 minutes) - cancelling")
+                        future.cancel()
+                        return False
+                
+                # Get result
+                try:
+                    success = future.result(timeout=30)
+                    if not success:
+                        return False
+                except TimeoutError:
+                    print("⏰ Download timed out")
+                    return False
+            
+            print(f"📂 Checking downloaded files in {temp_dir}")
+            temp_files = list(temp_dir.rglob("*"))
+            print(f"Found {len(temp_files)} items in temp directory")
+            
+            if not temp_files:
+                print("❌ No files were downloaded")
+                return False
             
             # Move files to final location
+            print("📦 Moving files to final location...")
+            moved_count = 0
+            
             for item in temp_dir.iterdir():
-                if item.is_dir():
-                    shutil.move(str(item), str(cache_path / item.name))
-                else:
-                    shutil.move(str(item), str(cache_path / item.name))
+                try:
+                    if item.is_dir():
+                        dest = cache_path / item.name
+                        if not dest.exists():
+                            shutil.move(str(item), str(dest))
+                            moved_count += 1
+                            print(f"📁 Moved directory: {item.name}")
+                    else:
+                        dest = cache_path / item.name
+                        if not dest.exists():
+                            shutil.move(str(item), str(dest))
+                            moved_count += 1
+                            print(f"📄 Moved file: {item.name}")
+                except Exception as e:
+                    print(f"⚠️ Error moving {item.name}: {e}")
             
             # Clean up temp directory
-            shutil.rmtree(temp_dir, ignore_errors=True)
+            try:
+                shutil.rmtree(temp_dir, ignore_errors=True)
+                print("🧹 Cleaned up temp directory")
+            except:
+                pass
             
-            print(f"✓ Successfully downloaded {dataset_id}")
+            # Final verification
+            final_files = list(cache_path.rglob("*"))
+            audio_files = [f for f in final_files if f.suffix.lower() in ['.wav', '.mp3', '.flac', '.ogg']]
+            
+            print(f"✅ Download completed!")
+            print(f"📊 Total files: {len(final_files)}")
+            print(f"🎵 Audio files: {len(audio_files)}")
+            print(f"⏱️ Total time: {time.time() - start_time:.1f}s")
+            
             return True
             
         except Exception as e:
-            print(f"✗ Failed to download {dataset_id}: {e}")
+            print(f"❌ Failed to download {dataset_id}: {e}")
+            import traceback
+            traceback.print_exc()
             return False
     
     def download_google_drive_folder(self, folder_id: str, cache_path: Path) -> bool:
@@ -399,6 +496,50 @@ class AudioCatalog:
             return selected.get("absolute_path")
         
         return None
+    
+    def process_audio_chunk(self, audio_files: list, config: DatasetConfig):
+        """Process a chunk of audio files for Streamlit progress"""
+        dataset_path = Path(config.cache_dir)
+        
+        for audio_file in audio_files:
+            try:
+                # Calculate file hash for deduplication
+                file_hash = self._calculate_file_hash(audio_file)
+                
+                # Get audio metadata
+                audio_info = self._get_audio_info(audio_file)
+                
+                # Store file information
+                relative_path = audio_file.relative_to(dataset_path)
+                file_info = {
+                    "absolute_path": str(audio_file),
+                    "hash": file_hash,
+                    "dataset": config.dataset_name,
+                    "source_type": self._infer_source_type(audio_file),
+                    **audio_info
+                }
+                
+                # Add to global catalog
+                self.catalog["files"][file_hash] = file_info
+                
+            except Exception as e:
+                print(f"Warning: Could not process {audio_file}: {e}")
+    
+    def finalize_dataset_catalog(self, config: DatasetConfig):
+        """Finalize the dataset catalog after chunk processing"""
+        # Count files for this dataset
+        dataset_files = [f for f in self.catalog["files"].values() 
+                        if f.get("dataset") == config.dataset_name]
+        
+        # Store dataset information
+        self.catalog["datasets"][config.dataset_name] = {
+            "config": config.dict(),
+            "file_count": len(dataset_files),
+            "scan_date": pd.Timestamp.now().isoformat()
+        }
+        
+        self._save_catalog()
+        print(f"✓ Cataloged {len(dataset_files)} files from {config.dataset_name}")
 
 class SmartAudioSelector:
     """Intelligently selects appropriate audio files for simulation sources"""
@@ -437,13 +578,74 @@ class DatasetManager:
         
         print(f"Setting up dataset: {config.dataset_name}")
         
+        success = False
+        scan_path = None
+        
+        if config.source_type == "local":
+            # Local dataset - just catalog existing files
+            local_path = Path(config.path_or_id)
+            if local_path.exists():
+                success = True
+                scan_path = local_path
+                print(f"✓ Local dataset found at {local_path}")
+            else:
+                print(f"✗ Local path not found: {local_path}")
+                
+        else:
+            # For non-local datasets, create cache directory
+            dataset_path = Path(config.cache_dir)
+            dataset_path.mkdir(parents=True, exist_ok=True)
+            
+            if config.source_type == "kaggle":
+                success = self.downloader.download_kaggle_dataset(
+                    config.path_or_id, dataset_path
+                )
+                # For Kaggle, scan the cache directory where files were downloaded
+                if success:
+                    scan_path = dataset_path
+                
+            elif config.source_type == "google_drive":
+                success = self.downloader.download_google_drive_folder(
+                    config.path_or_id, dataset_path
+                )
+                if success:
+                    scan_path = dataset_path
+                
+            elif config.source_type == "url":
+                success = self.downloader.download_url_dataset(
+                    config.path_or_id, dataset_path
+                )
+                if success:
+                    scan_path = dataset_path
+        
+        if success and scan_path:
+            # Create a modified config for scanning with the correct path
+            scan_config = DatasetConfig(
+                dataset_name=config.dataset_name,
+                source_type=config.source_type,
+                path_or_id=str(scan_path),  # Use the actual path where files are located
+                audio_extensions=config.audio_extensions,
+                metadata_file=config.metadata_file,
+                cache_dir=config.cache_dir
+            )
+            
+            # Catalog the dataset
+            self.catalog.scan_dataset(scan_config)
+            
+        return success
+    
+    def setup_dataset_download_only(self, config: DatasetConfig) -> bool:
+        """Setup a dataset (download only, no cataloging) for Streamlit progress"""
+        
+        print(f"Downloading dataset: {config.dataset_name}")
+        
         dataset_path = Path(config.cache_dir)
         dataset_path.mkdir(parents=True, exist_ok=True)
         
         success = False
         
         if config.source_type == "local":
-            # Local dataset - just catalog existing files
+            # Local dataset - just verify it exists
             local_path = Path(config.path_or_id)
             if local_path.exists():
                 success = True
@@ -466,12 +668,8 @@ class DatasetManager:
                 config.path_or_id, dataset_path
             )
         
-        if success:
-            # Catalog the dataset
-            self.catalog.scan_dataset(config)
-            
         return success
-    
+
     def get_dataset_summary(self) -> Dict:
         """Get summary of all datasets"""
         
