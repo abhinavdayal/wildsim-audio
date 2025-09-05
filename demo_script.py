@@ -1,5 +1,5 @@
 """
-Enhanced Demo Script for Pyroomacoustics-based Wildlife Acoustic Simulation
+Demo Script for Pyroomacoustics-based Wildlife Acoustic Simulation
 Includes synthetic audio generation and comprehensive validation
 """
 
