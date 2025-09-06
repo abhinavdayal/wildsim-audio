@@ -1,0 +1,33 @@
+name: "Multi Elephant Scene"
+duration: 20.0
+sample_rate: 16000
+description: "Multiple elephants from different directions"
+
+sounds:
+  - sound_type: "elephant"
+    dataset: "wild_animals"
+    distance: 100.0
+    azimuth: 0.0       # North
+    elevation: 0.0
+    start_time: 1.0
+    volume: 1.0
+  
+  - sound_type: "elephant"
+    dataset: "wild_animals"
+    distance: 150.0
+    azimuth: 90.0      # East
+    elevation: 0.0
+    start_time: 5.0
+    volume: 0.8
+  
+  - sound_type: "elephant"
+    dataset: "wild_animals"
+    distance: 200.0
+    azimuth: 270.0     # West
+    elevation: 0.0
+    start_time: 10.0
+    volume: 1.2
+
+ambient:
+  - sound_type: "forest"
+    level_db: -40.0

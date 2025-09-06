@@ -12,6 +12,7 @@ import os
 
 class SourceType(str, Enum):
     """Supported sound source types"""
+    # Original categories
     ELEPHANT = "elephant"
     BIRD = "bird"
     VEHICLE = "vehicle"
@@ -21,6 +22,45 @@ class SourceType(str, Enum):
     WATER = "water"
     INSECT = "insect"
     UNKNOWN = "unknown"
+    
+    # Forest dataset sound classes
+    AXE = "axe"
+    BIRDCHIRPING = "birdchirping"
+    CHAINSAW = "chainsaw"
+    CLAPPING = "clapping"
+    FIRE = "fire"
+    FIREWORK = "firework"
+    FOOTSTEPS = "footsteps"
+    FROG = "frog"
+    GENERATOR = "generator"
+    GUNSHOT = "gunshot"
+    HANDSAW = "handsaw"
+    HELICOPTER = "helicopter"
+    LION = "lion"
+    RAIN = "rain"
+    SILENCE = "silence"
+    SPEAKING = "speaking"
+    SQUIRREL = "squirrel"
+    THUNDERSTORM = "thunderstorm"
+    TREEFALLING = "treefalling"
+    VEHICLEENGINE = "vehicleengine"
+    WATERDROPS = "waterdrops"
+    WHISTLING = "whistling"
+    WIND = "wind"
+    WINGFLAPING = "wingflaping"
+    WOLFHOWL = "wolfhowl"
+    WOODCHOP = "woodchop"
+    
+    # Wild animals dataset classes
+    BEAR = "bear"
+    CAT = "cat"
+    CHICKEN = "chicken"
+    COW = "cow"
+    DOG = "dog"
+    DOLPHIN = "dolphin"
+    DONKEY = "donkey"
+    HORSE = "horse"
+    SHEEP = "sheep"
 
 class AmbientType(str, Enum):
     """Supported ambient condition types"""

@@ -359,6 +359,12 @@ class AudioCatalog:
         
         print(f"Found {len(audio_files)} audio files")
         
+        # Load CSV metadata if available
+        csv_labels = {}
+        if dataset_config.metadata_file:
+            csv_labels = self._load_csv_labels(dataset_path, dataset_config.metadata_file)
+            print(f"Loaded {len(csv_labels)} labels from CSV metadata")
+        
         # Process each file
         for audio_file in tqdm(audio_files, desc="Processing audio files"):
             try:
@@ -368,13 +374,16 @@ class AudioCatalog:
                 # Get audio metadata
                 audio_info = self._get_audio_info(audio_file)
                 
+                # Determine source type using unified labeling system
+                source_type = self._get_unified_label(audio_file, dataset_path, csv_labels)
+                
                 # Store file information
                 relative_path = audio_file.relative_to(dataset_path)
                 file_info[str(relative_path)] = {
                     "absolute_path": str(audio_file),
                     "hash": file_hash,
                     "dataset": dataset_config.dataset_name,
-                    "source_type": self._infer_source_type(audio_file),
+                    "source_type": source_type,
                     **audio_info
                 }
                 
@@ -395,6 +404,179 @@ class AudioCatalog:
         
         print(f"✓ Cataloged {len(file_info)} files from {dataset_config.dataset_name}")
         return file_info
+    
+    def _load_csv_labels(self, dataset_path: Path, metadata_file: str) -> Dict[str, str]:
+        """Load labels from CSV metadata file"""
+        csv_path = dataset_path / metadata_file
+        if not csv_path.exists():
+            print(f"Warning: Metadata file not found: {csv_path}")
+            return {}
+        
+        try:
+            df = pd.read_csv(csv_path)
+            print(f"CSV columns: {list(df.columns)}")
+            
+            # Common column name variations for filename and class/label
+            filename_cols = ['filename', 'file', 'audio_file', 'audio_filename', 'name']
+            label_cols = ['class', 'label', 'category', 'target', 'annotation']
+            
+            # Find the actual column names
+            filename_col = None
+            label_col = None
+            
+            for col in df.columns:
+                col_lower = col.lower()
+                if any(fc in col_lower for fc in filename_cols):
+                    filename_col = col
+                if any(lc in col_lower for lc in label_cols):
+                    label_col = col
+            
+            if not filename_col or not label_col:
+                print(f"Warning: Could not find filename and label columns in {csv_path}")
+                print(f"Available columns: {list(df.columns)}")
+                return {}
+            
+            # Create mapping from filename to label
+            labels = {}
+            for _, row in df.iterrows():
+                filename = str(row[filename_col])
+                label = str(row[label_col]).lower()
+                
+                # Clean filename (remove extension, etc.)
+                filename = Path(filename).stem
+                labels[filename] = label
+            
+            print(f"Loaded {len(labels)} filename-to-label mappings")
+            return labels
+            
+        except Exception as e:
+            print(f"Error loading CSV metadata: {e}")
+            return {}
+    
+    def _get_unified_label(self, file_path: Path, dataset_path: Path, csv_labels: Dict[str, str]) -> str:
+        """Get label using unified labeling system (CSV > filename > folder)"""
+        
+        # Priority 1: CSV metadata
+        filename_stem = file_path.stem.lower()
+        if csv_labels and filename_stem in csv_labels:
+            csv_label = csv_labels[filename_stem]
+            # Map CSV label to SourceType enum
+            mapped_type = self._map_label_to_source_type(csv_label)
+            if mapped_type != SourceType.UNKNOWN:
+                return mapped_type.value
+        
+        # Priority 2: Filename pattern extraction
+        filename_type = self._infer_source_type(file_path)
+        if filename_type != SourceType.UNKNOWN.value:
+            return filename_type
+        
+        # Priority 3: Folder structure
+        relative_path = file_path.relative_to(dataset_path)
+        folder_parts = list(relative_path.parts[:-1])  # Exclude filename
+        
+        for folder in folder_parts:
+            folder_lower = folder.lower()
+            mapped_type = self._map_label_to_source_type(folder_lower)
+            if mapped_type != SourceType.UNKNOWN:
+                return mapped_type.value
+        
+        return SourceType.UNKNOWN.value
+    
+    def _map_label_to_source_type(self, label: str) -> SourceType:
+        """Map various label formats to SourceType enum"""
+        label_lower = label.lower().strip()
+        
+        # Direct mapping for all dataset classes
+        direct_mapping = {
+            # Forest dataset classes
+            'axe': SourceType.AXE,
+            'birdchirping': SourceType.BIRDCHIRPING,
+            'chainsaw': SourceType.CHAINSAW,
+            'clapping': SourceType.CLAPPING,
+            'fire': SourceType.FIRE,
+            'firework': SourceType.FIREWORK,
+            'footsteps': SourceType.FOOTSTEPS,
+            'frog': SourceType.FROG,
+            'generator': SourceType.GENERATOR,
+            'gunshot': SourceType.GUNSHOT,
+            'handsaw': SourceType.HANDSAW,
+            'helicopter': SourceType.HELICOPTER,
+            'insect': SourceType.INSECT,
+            'lion': SourceType.LION,
+            'rain': SourceType.RAIN,
+            'silence': SourceType.SILENCE,
+            'speaking': SourceType.SPEAKING,
+            'squirrel': SourceType.SQUIRREL,
+            'thunderstorm': SourceType.THUNDERSTORM,
+            'treefalling': SourceType.TREEFALLING,
+            'vehicleengine': SourceType.VEHICLEENGINE,
+            'waterdrops': SourceType.WATERDROPS,
+            'whistling': SourceType.WHISTLING,
+            'wind': SourceType.WIND,
+            'wingflaping': SourceType.WINGFLAPING,
+            'wolfhowl': SourceType.WOLFHOWL,
+            'woodchop': SourceType.WOODCHOP,
+            
+            # Wild animals dataset classes
+            'bear': SourceType.BEAR,
+            'cat': SourceType.CAT,
+            'chicken': SourceType.CHICKEN,
+            'cow': SourceType.COW,
+            'dog': SourceType.DOG,
+            'dolphin': SourceType.DOLPHIN,
+            'donkey': SourceType.DONKEY,
+            'horse': SourceType.HORSE,
+            'sheep': SourceType.SHEEP,
+            
+            # Original categories
+            'elephant': SourceType.ELEPHANT,
+            'bird': SourceType.BIRD,
+            'vehicle': SourceType.VEHICLE,
+            'monkey': SourceType.MONKEY,
+            'human_activity': SourceType.HUMAN_ACTIVITY,
+            'machinery': SourceType.MACHINERY,
+            'water': SourceType.WATER
+        }
+        
+        if label_lower in direct_mapping:
+            return direct_mapping[label_lower]
+        
+        # Fuzzy matching for variations
+        fuzzy_mapping = {
+            'bird': ['birds', 'avian', 'chirping', 'tweet', 'song'],
+            'elephant': ['elephants', 'jumbo', 'tusker'],
+            'vehicle': ['vehicles', 'car', 'cars', 'truck', 'trucks', 'automobile'],
+            'monkey': ['monkeys', 'primate', 'primates', 'ape', 'apes'],
+            'machinery': ['machine', 'machines', 'equipment'],
+            'water': ['stream', 'river', 'flowing'],
+            'insect': ['insects', 'cricket', 'crickets', 'cicada'],
+            'human_activity': ['human', 'people', 'voice', 'voices'],
+            'gunshot': ['gun', 'shooting', 'rifle', 'firearm'],
+            'helicopter': ['heli', 'aircraft', 'rotor'],
+            'wolfhowl': ['wolf', 'wolves', 'howling', 'canine'],
+            'treefalling': ['tree_falling', 'falling_tree', 'timber'],
+            'vehicleengine': ['vehicle_engine', 'engine', 'motor'],
+            
+            # Wild animals variations
+            'lion': ['lions', 'big_cat', 'aslan'],  # Aslan is Turkish for lion
+            'bear': ['bears', 'grizzly', 'black_bear'],
+            'cat': ['cats', 'feline', 'kitten'],
+            'chicken': ['chickens', 'hen', 'rooster', 'poultry'],
+            'cow': ['cows', 'cattle', 'bull', 'bovine'],
+            'dog': ['dogs', 'canine', 'puppy', 'hound'],
+            'dolphin': ['dolphins', 'whale', 'marine_mammal'],
+            'donkey': ['donkeys', 'ass', 'mule'],
+            'horse': ['horses', 'equine', 'stallion', 'mare'],
+            'sheep': ['sheep', 'lamb', 'ewe', 'ram'],
+            'frog': ['frogs', 'amphibian', 'toad']
+        }
+        
+        for main_type, variations in fuzzy_mapping.items():
+            if any(var in label_lower for var in variations):
+                if main_type in direct_mapping:
+                    return direct_mapping[main_type]
+        
+        return SourceType.UNKNOWN
     
     def _calculate_file_hash(self, file_path: Path) -> str:
         """Calculate SHA-256 hash of file"""
@@ -439,21 +621,151 @@ class AudioCatalog:
             }
     
     def _infer_source_type(self, file_path: Path) -> str:
-        """Infer source type from filename/path"""
+        """Infer source type from filename/path using comprehensive mapping"""
         path_str = str(file_path).lower()
+        filename = file_path.stem.lower()
         
-        # Keywords for different source types
-        keywords = {
-            SourceType.ELEPHANT: ['elephant', 'jumbo', 'tusker'],
-            SourceType.BIRD: ['bird', 'avian', 'chirp', 'tweet', 'song'],
-            SourceType.VEHICLE: ['car', 'truck', 'vehicle', 'engine', 'traffic'],
-            SourceType.MONKEY: ['monkey', 'primate', 'ape', 'chimp'],
-            SourceType.MACHINERY: ['machine', 'chainsaw', 'drill', 'construction'],
-            SourceType.WATER: ['water', 'rain', 'river', 'stream'],
-            SourceType.INSECT: ['insect', 'cricket', 'cicada', 'buzz']
+        # Pattern 1: Forest dataset naming pattern (e.g., "fire01" -> "fire")
+        forest_class_pattern = r'^([a-z]+)\d+$'
+        import re
+        match = re.match(forest_class_pattern, filename)
+        if match:
+            class_name = match.group(1)
+            # Map forest classes to SourceType enum values
+            forest_class_mapping = {
+                'axe': SourceType.AXE,
+                'birdchirping': SourceType.BIRDCHIRPING,
+                'chainsaw': SourceType.CHAINSAW,
+                'clapping': SourceType.CLAPPING,
+                'fire': SourceType.FIRE,
+                'firework': SourceType.FIREWORK,
+                'footsteps': SourceType.FOOTSTEPS,
+                'frog': SourceType.FROG,
+                'generator': SourceType.GENERATOR,
+                'gunshot': SourceType.GUNSHOT,
+                'handsaw': SourceType.HANDSAW,
+                'helicopter': SourceType.HELICOPTER,
+                'insect': SourceType.INSECT,
+                'lion': SourceType.LION,
+                'rain': SourceType.RAIN,
+                'silence': SourceType.SILENCE,
+                'speaking': SourceType.SPEAKING,
+                'squirrel': SourceType.SQUIRREL,
+                'thunderstorm': SourceType.THUNDERSTORM,
+                'treefalling': SourceType.TREEFALLING,
+                'vehicleengine': SourceType.VEHICLEENGINE,
+                'waterdrops': SourceType.WATERDROPS,
+                'whistling': SourceType.WHISTLING,
+                'wind': SourceType.WIND,
+                'wingflaping': SourceType.WINGFLAPING,
+                'wolfhowl': SourceType.WOLFHOWL,
+                'woodchop': SourceType.WOODCHOP,
+                
+                # Wild animals that might appear in forest pattern
+                'bear': SourceType.BEAR,
+                'cat': SourceType.CAT,
+                'chicken': SourceType.CHICKEN,
+                'cow': SourceType.COW,
+                'dog': SourceType.DOG,
+                'dolphin': SourceType.DOLPHIN,
+                'donkey': SourceType.DONKEY,
+                'elephant': SourceType.ELEPHANT,
+                'horse': SourceType.HORSE,
+                'monkey': SourceType.MONKEY,
+                'sheep': SourceType.SHEEP
+            }
+            
+            if class_name in forest_class_mapping:
+                return forest_class_mapping[class_name].value
+        
+        # Pattern 2: Wild animals naming pattern (e.g., "Lion_1" -> "lion")
+        wild_animals_pattern = r'^([a-z]+)_\d+$'
+        match = re.match(wild_animals_pattern, filename)
+        if match:
+            animal_name = match.group(1)
+            # Map to SourceType enum
+            mapped_type = self._map_label_to_source_type(animal_name)
+            if mapped_type != SourceType.UNKNOWN:
+                return mapped_type.value
+        
+        # Pattern 3: Simple animal name patterns (e.g., "elephant_call", "bird_song")
+        simple_animal_pattern = r'^([a-z]+)(?:_.*)?$'
+        match = re.match(simple_animal_pattern, filename)
+        if match:
+            animal_name = match.group(1)
+            mapped_type = self._map_label_to_source_type(animal_name)
+            if mapped_type != SourceType.UNKNOWN:
+                return mapped_type.value
+        
+        # Folder-based classification (check parent directory names)
+        path_parts = [part.lower() for part in file_path.parts]
+        
+        # Special mapping for wild animals folder structure
+        wild_animals_folder_mapping = {
+            'aslan': SourceType.LION,  # Turkish for lion
+            'bear': SourceType.BEAR,
+            'cat': SourceType.CAT,
+            'chicken': SourceType.CHICKEN,
+            'cow': SourceType.COW,
+            'dog': SourceType.DOG,
+            'dolphin': SourceType.DOLPHIN,
+            'donkey': SourceType.DONKEY,
+            'elephant': SourceType.ELEPHANT,
+            'frog': SourceType.FROG,
+            'horse': SourceType.HORSE,
+            'monkey': SourceType.MONKEY,
+            'sheep': SourceType.SHEEP
         }
         
-        for source_type, words in keywords.items():
+        for part in path_parts:
+            if part in wild_animals_folder_mapping:
+                return wild_animals_folder_mapping[part].value
+            
+            # Check other common folder names
+            if part in ['elephants']:
+                return SourceType.ELEPHANT.value
+            elif part in ['birds', 'avian']:
+                return SourceType.BIRD.value
+            elif part in ['vehicles', 'cars']:
+                return SourceType.VEHICLE.value
+            elif part in ['monkeys', 'primates']:
+                return SourceType.MONKEY.value
+        
+        # Keywords for different source types (filename and path based)
+        keyword_mapping = {
+            SourceType.ELEPHANT: ['elephant', 'jumbo', 'tusker'],
+            SourceType.BIRD: ['bird', 'avian', 'chirp', 'tweet', 'song', 'birdchirping', 'wingflap'],
+            SourceType.VEHICLE: ['car', 'truck', 'vehicle', 'traffic', 'vehicleengine'],
+            SourceType.MONKEY: ['monkey', 'primate', 'ape', 'chimp'],
+            SourceType.MACHINERY: ['machine', 'chainsaw', 'drill', 'construction', 'generator', 'handsaw'],
+            SourceType.WATER: ['water', 'rain', 'river', 'stream', 'waterdrops'],
+            SourceType.INSECT: ['insect', 'cricket', 'cicada', 'buzz', 'frog'],
+            SourceType.HUMAN_ACTIVITY: ['human', 'voice', 'speak', 'talk', 'clap', 'footstep', 'whistle'],
+            SourceType.FIRE: ['fire', 'burn', 'flame'],
+            SourceType.WIND: ['wind', 'breeze', 'gust'],
+            SourceType.GUNSHOT: ['gun', 'shot', 'rifle', 'firearm'],
+            SourceType.HELICOPTER: ['helicopter', 'heli', 'rotor'],
+            SourceType.LION: ['lion', 'roar', 'big cat'],
+            SourceType.WOLFHOWL: ['wolf', 'howl', 'canine'],
+            SourceType.THUNDERSTORM: ['thunder', 'storm', 'lightning'],
+            SourceType.TREEFALLING: ['tree', 'fall', 'timber', 'crash'],
+            SourceType.FIREWORK: ['firework', 'firecracker', 'pyrotechnic'],
+            SourceType.SILENCE: ['silence', 'quiet', 'ambient'],
+            SourceType.SQUIRREL: ['squirrel', 'rodent'],
+            
+            # Wild animals keywords
+            SourceType.BEAR: ['bear', 'grizzly', 'black bear'],
+            SourceType.CAT: ['cat', 'feline', 'kitten', 'meow'],
+            SourceType.CHICKEN: ['chicken', 'hen', 'rooster', 'cluck'],
+            SourceType.COW: ['cow', 'cattle', 'bull', 'moo'],
+            SourceType.DOG: ['dog', 'bark', 'puppy', 'woof'],
+            SourceType.DOLPHIN: ['dolphin', 'whale', 'marine'],
+            SourceType.DONKEY: ['donkey', 'ass', 'mule', 'bray'],
+            SourceType.HORSE: ['horse', 'neigh', 'stallion', 'mare'],
+            SourceType.SHEEP: ['sheep', 'lamb', 'baa', 'bleat']
+        }
+        
+        for source_type, words in keyword_mapping.items():
             if any(word in path_str for word in words):
                 return source_type.value
         
@@ -692,6 +1004,57 @@ class DatasetManager:
             summary["format_counts"][format_ext] = summary["format_counts"].get(format_ext, 0) + 1
         
         return summary
+    
+    def get_files_by_category(self, category: Union[str, SourceType], 
+                             dataset_name: Optional[str] = None,
+                             limit: Optional[int] = None) -> List[Dict]:
+        """Get audio files by category/source type for unified labeling system"""
+        
+        # Convert SourceType enum to string if needed
+        if isinstance(category, SourceType):
+            category_str = category.value
+        else:
+            category_str = str(category).lower()
+        
+        matches = self.catalog.find_audio_files(
+            source_type=SourceType(category_str) if category_str in [e.value for e in SourceType] else None,
+            dataset_name=dataset_name
+        )
+        
+        if limit:
+            matches = matches[:limit]
+        
+        return matches
+    
+    def get_available_categories(self, dataset_name: Optional[str] = None) -> List[str]:
+        """Get all available sound categories/labels"""
+        
+        catalog_data = self.catalog.catalog
+        categories = set()
+        
+        for file_info in catalog_data.get("files", {}).values():
+            # Filter by dataset if specified
+            if dataset_name and file_info.get("dataset") != dataset_name:
+                continue
+                
+            source_type = file_info.get("source_type")
+            if source_type:
+                categories.add(source_type)
+        
+        return sorted(list(categories))
+    
+    def get_random_file_by_category(self, category: Union[str, SourceType], 
+                                   dataset_name: Optional[str] = None) -> Optional[str]:
+        """Get a random audio file from a specific category"""
+        
+        files = self.get_files_by_category(category, dataset_name, limit=50)  # Limit for performance
+        
+        if files:
+            import random
+            selected = random.choice(files)
+            return selected.get("absolute_path")
+        
+        return None
 
 if __name__ == "__main__":
     # Test dataset manager

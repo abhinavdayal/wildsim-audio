@@ -22,6 +22,7 @@ from models import *
 from dataset_manager import DatasetManager, SmartAudioSelector
 from acoustic_scene_generator import WildlifeAcousticSimulator, save_simulation_results
 from auth_helpers import *
+from scene_creator import render_scene_creator_tab
 import pyroomacoustics as pra
 
 # Page configuration
@@ -91,40 +92,6 @@ class SimulationSession:
             st.session_state.dataset_manager = None
         if 'current_config' not in st.session_state:
             st.session_state.current_config = None
-
-def initialize_app():
-    """Initialize the application"""
-    
-    st.markdown('<h1 class="main-header">🐘 Wildlife Acoustic Scene Simulator</h1>', 
-                unsafe_allow_html=True)
-    
-    st.markdown("""
-    **Create realistic acoustic scenes for wildlife monitoring algorithm validation**
-    
-    This tool generates synthetic microphone array data with:
-    - Realistic 3D acoustic propagation using pyroomacoustics
-    - Real wildlife audio from datasets (Kaggle, Google Drive, local files)
-    - Ground truth DOA information for algorithm validation
-    - Built-in DOA algorithm comparison (MUSIC, SRP-PHAT, FRIDA)
-    """)
-
-def sidebar_navigation():
-    """Create sidebar navigation"""
-    
-    st.sidebar.title("🎛️ Navigation")
-    
-    pages = {
-        "🏠 Home": "home",
-        "📊 Dataset Manager": "datasets", 
-        "⚙️ Configuration": "config",
-        "🎬 Simulation": "simulation",
-        "📈 Analysis": "analysis",
-        "💾 Export/Import": "export",
-        "📚 Help": "help"
-    }
-    
-    selected = st.sidebar.selectbox("Select Page", list(pages.keys()))
-    return pages[selected]
 
 def dataset_manager_page():
     """Dataset management page"""
@@ -412,11 +379,11 @@ def dataset_manager_page():
                     submit = st.button(
                         "🔄 Re-setup Dataset", 
                         type="secondary",
-                        use_container_width=True,
+                        width='stretch',
                         help="Re-process this dataset (will overwrite existing catalog)"
                     )
                 with col_b:
-                    if st.button("📊 View Summary", type="primary", use_container_width=True):
+                    if st.button("📊 View Summary", type="primary", width='stretch'):
                         st.info("💡 Go to the 'Dataset Summary' tab above to view dataset details")
             else:
                 # Standard setup button
@@ -424,7 +391,7 @@ def dataset_manager_page():
                 submit = st.button(
                     "🔄 Setup Dataset", 
                     type="primary",
-                    use_container_width=True,
+                    width='stretch',
                     disabled=button_disabled,
                     help="Download and catalog this dataset" if not button_disabled else "Please fill in all required fields"
                 )
@@ -537,7 +504,7 @@ def dataset_manager_page():
             if summary["datasets"]:
                 st.subheader("Datasets")
                 df_datasets = pd.DataFrame.from_dict(summary["datasets"], orient="index")
-                st.dataframe(df_datasets, use_container_width=True)
+                st.dataframe(df_datasets, width='stretch')
             
             # Source type distribution
             col1, col2 = st.columns(2)
@@ -550,7 +517,7 @@ def dataset_manager_page():
                         names=list(summary["source_type_counts"].keys()),
                         title="Distribution by Source Type"
                     )
-                    st.plotly_chart(fig_sources, use_container_width=True)
+                    st.plotly_chart(fig_sources, width='stretch')
             
             with col2:
                 if summary["format_counts"]:
@@ -560,13 +527,19 @@ def dataset_manager_page():
                         y=list(summary["format_counts"].values()),
                         title="Files by Format"
                     )
-                    st.plotly_chart(fig_formats, use_container_width=True)
+                    st.plotly_chart(fig_formats, width='stretch')
             
         except Exception as e:
             st.error(f"Error getting dataset summary: {e}")
     
     with tab3:
         st.subheader("Browse Audio Files")
+        
+        # Initialize session state for search results
+        if 'browse_search_results' not in st.session_state:
+            st.session_state.browse_search_results = None
+        if 'browse_selected_file_idx' not in st.session_state:
+            st.session_state.browse_selected_file_idx = None
         
         # Filters
         col1, col2, col3 = st.columns(3)
@@ -583,47 +556,124 @@ def dataset_manager_page():
             filter_dataset = st.selectbox("Filter by Dataset", 
                 ["All"] + list(dataset_manager.catalog.catalog["datasets"].keys()))
         
+        # Search button
         if st.button("🔍 Search Files"):
-            try:
-                # Apply filters
-                source_filter = None if filter_source_type == "All" else SourceType(filter_source_type)
-                dataset_filter = None if filter_dataset == "All" else filter_dataset
+            with st.spinner("Searching files..."):
+                try:
+                    # Apply filters
+                    source_filter = None if filter_source_type == "All" else SourceType(filter_source_type)
+                    dataset_filter = None if filter_dataset == "All" else filter_dataset
+                    
+                    matches = dataset_manager.catalog.find_audio_files(
+                        source_type=source_filter,
+                        min_duration=min_duration,
+                        max_duration=max_duration,
+                        dataset_name=dataset_filter
+                    )
+                    
+                    # Store results in session state
+                    st.session_state.browse_search_results = matches
+                    st.session_state.browse_selected_file_idx = None  # Reset selection
+                    
+                    # Force rerun to update the display without changing tabs
+                    st.rerun()
+                    
+                except Exception as e:
+                    st.error(f"Error searching files: {e}")
+                    st.session_state.browse_search_results = None
+        
+        # Display search results if available
+        if st.session_state.browse_search_results is not None:
+            matches = st.session_state.browse_search_results
+            
+            if matches:
+                st.success(f"Found {len(matches)} matching files")
                 
-                matches = dataset_manager.catalog.find_audio_files(
-                    source_type=source_filter,
-                    min_duration=min_duration,
-                    max_duration=max_duration,
-                    dataset_name=dataset_filter
-                )
+                # Convert to DataFrame for display
+                df_files = pd.DataFrame(matches)
                 
-                if matches:
-                    st.success(f"Found {len(matches)} matching files")
+                # Select columns to display
+                display_cols = ["absolute_path", "source_type", "duration", 
+                               "sample_rate", "format", "dataset"]
+                available_cols = [col for col in display_cols if col in df_files.columns]
+                
+                # Create a cleaner display dataframe
+                display_df = df_files[available_cols].copy()
+                display_df['filename'] = display_df['absolute_path'].apply(lambda x: Path(x).name)
+                
+                # Reorder columns to show filename first
+                cols_reordered = ['filename'] + [col for col in available_cols if col != 'absolute_path']
+                display_df = display_df[cols_reordered]
+                
+                # Display the metadata table first
+                st.write("📋 **Search Results:**")
+                st.dataframe(display_df, width='stretch')
+                
+                # File selection with scrollable container
+                st.write("🎵 **Select a file to preview:**")
+                st.caption(f"📊 Total results: {len(matches)} files")
+                
+                # Create a scrollable container using st.container with height
+                container = st.container(height=400)
+                with container:
+                    # Use radio buttons with dataset name included - show all results in scrollable container
+                    selected_file_idx = st.radio(
+                        "Choose file:",
+                        range(len(matches)),
+                        format_func=lambda x: f"🎵 {Path(matches[x]['absolute_path']).name} ({matches[x].get('duration', 0):.1f}s) - {matches[x].get('dataset', 'Unknown Dataset')}",
+                        key="browse_file_selector",
+                        horizontal=False
+                    )
+                
+                # Store selection
+                st.session_state.browse_selected_file_idx = selected_file_idx
+                
+                # Audio player for selected file
+                if selected_file_idx is not None and selected_file_idx < len(matches):
+                    selected_file = matches[selected_file_idx]["absolute_path"]
+                    selected_filename = Path(selected_file).name
                     
-                    # Convert to DataFrame for display
-                    df_files = pd.DataFrame(matches)
+                    st.success(f"🎵 **Now Playing:** {selected_filename}")
                     
-                    # Select columns to display
-                    display_cols = ["absolute_path", "source_type", "duration", 
-                                   "sample_rate", "format", "dataset"]
-                    available_cols = [col for col in display_cols if col in df_files.columns]
-                    
-                    st.dataframe(df_files[available_cols], use_container_width=True)
-                    
-                    # Audio player for selected file
-                    if len(matches) > 0:
-                        selected_idx = st.selectbox("Select file to preview", 
-                                                   range(len(matches)),
-                                                   format_func=lambda x: f"File {x+1}: {Path(matches[x]['absolute_path']).name}")
-                        
-                        selected_file = matches[selected_idx]["absolute_path"]
-                        if Path(selected_file).exists():
+                    if Path(selected_file).exists():
+                        try:
                             with open(selected_file, "rb") as audio_file:
-                                st.audio(audio_file.read(), format="audio/wav")
-                else:
-                    st.warning("No files match the specified criteria")
-                    
-            except Exception as e:
-                st.error(f"Error searching files: {e}")
+                                audio_bytes = audio_file.read()
+                                
+                            # Determine audio format from file extension
+                            file_ext = Path(selected_file).suffix.lower()
+                            if file_ext == '.wav':
+                                audio_format = 'audio/wav'
+                            elif file_ext == '.mp3':
+                                audio_format = 'audio/mp3'
+                            elif file_ext == '.ogg':
+                                audio_format = 'audio/ogg'
+                            else:
+                                audio_format = 'audio/wav'  # Default
+                            
+                            st.audio(audio_bytes, format=audio_format)
+                            
+                            # Show file info
+                            file_info = matches[selected_file_idx]
+                            with st.expander("📋 File Details", expanded=True):
+                                info_col1, info_col2 = st.columns(2)
+                                with info_col1:
+                                    st.write(f"**Duration:** {file_info.get('duration', 'Unknown'):.1f} seconds")
+                                    st.write(f"**Sample Rate:** {file_info.get('sample_rate', 'Unknown')} Hz")
+                                    st.write(f"**File Path:** {file_info.get('absolute_path', 'Unknown')}")
+                                with info_col2:
+                                    st.write(f"**Format:** {file_info.get('format', 'Unknown')}")
+                                    st.write(f"**Dataset:** {file_info.get('dataset', 'Unknown')}")
+                                    st.write(f"**Source Type:** {file_info.get('source_type', 'Unknown')}")
+                                    
+                        except Exception as e:
+                            st.error(f"Error loading audio file: {e}")
+                    else:
+                        st.error(f"File not found: {selected_file}")
+            else:
+                st.warning("No files match the specified criteria")
+        else:
+            st.info("👆 Use the filters above and click 'Search Files' to find audio files")
     
     with tab4:
         st.subheader("Dataset Settings")
@@ -644,6 +694,21 @@ def dataset_manager_page():
                 with st.spinner("Rebuilding catalog..."):
                     # Implementation would go here
                     st.info("Catalog rebuild not implemented in demo")
+
+def scene_creator_page():
+    """Scene creator page for building acoustic scenes"""
+    
+    st.markdown('<h2 class="section-header">🎬 Scene Creator</h2>', unsafe_allow_html=True)
+    
+    # Initialize dataset manager
+    if st.session_state.dataset_manager is None:
+        with st.spinner("Initializing dataset manager..."):
+            st.session_state.dataset_manager = DatasetManager()
+    
+    dataset_manager = st.session_state.dataset_manager
+    
+    # Render the scene creator interface
+    render_scene_creator_tab(dataset_manager)
 
 def configuration_page():
     """Configuration page for creating simulation scenarios"""
@@ -1140,7 +1205,7 @@ def simulation_page():
                     
                     if validation_df:
                         df = pd.DataFrame(validation_df)
-                        st.dataframe(df, use_container_width=True)
+                        st.dataframe(df, width='stretch')
                 
             except Exception as e:
                 st.error(f"❌ Simulation failed: {str(e)}")
@@ -1194,7 +1259,7 @@ def analysis_page():
         fig_time.update_xaxes(title="Time (s)", row=4, col=1)
         fig_time.update_yaxes(title="Amplitude")
         
-        st.plotly_chart(fig_time, use_container_width=True)
+        st.plotly_chart(fig_time, width='stretch')
         
         # Frequency analysis
         st.subheader("Frequency Analysis")
@@ -1220,7 +1285,7 @@ def analysis_page():
             xaxis_type="log"
         )
         
-        st.plotly_chart(fig_freq, use_container_width=True)
+        st.plotly_chart(fig_freq, width='stretch')
     
     with tab2:
         if validation:
@@ -1263,7 +1328,7 @@ def analysis_page():
                     yaxis_range=[0, 360]
                 )
                 
-                st.plotly_chart(fig_doa, use_container_width=True)
+                st.plotly_chart(fig_doa, width='stretch')
                 
                 # Error analysis
                 st.subheader("Estimation Errors")
@@ -1292,7 +1357,7 @@ def analysis_page():
                         labels={'Error': 'Error (degrees)'}
                     )
                     
-                    st.plotly_chart(fig_errors, use_container_width=True)
+                    st.plotly_chart(fig_errors, width='stretch')
         
         else:
             st.info("No DOA validation results available")
@@ -1342,7 +1407,7 @@ def analysis_page():
             )
         )
         
-        st.plotly_chart(fig_3d, use_container_width=True)
+        st.plotly_chart(fig_3d, width='stretch')
         
         # 2D top-down view
         fig_2d = go.Figure()
@@ -1391,7 +1456,7 @@ def analysis_page():
             xaxis=dict(scaleanchor="y", scaleratio=1)
         )
         
-        st.plotly_chart(fig_2d, use_container_width=True)
+        st.plotly_chart(fig_2d, width='stretch')
     
     with tab4:
         st.subheader("Detailed Results")
@@ -1560,9 +1625,8 @@ def sidebar_navigation():
     
     pages = {
         "🏠 Home": "home",
-        "📊 Dataset Manager": "datasets", 
-        "⚙️ Configuration": "config",
-        "🎬 Simulation": "simulation",
+        "📊 Dataset Manager": "datasets",
+        "🎬 Scene Creator": "scene_creator",
         "📈 Analysis": "analysis",
         "💾 Export/Import": "export",
         "📚 Help": "help"
@@ -1692,10 +1756,8 @@ def main():
         st.markdown("Use the sidebar to navigate to different sections of the application.")
     elif page == "datasets":
         dataset_manager_page()
-    elif page == "config":
-        configuration_page()
-    elif page == "simulation":
-        simulation_page()
+    elif page == "scene_creator":
+        scene_creator_page()
     elif page == "analysis":
         analysis_page()
     elif page == "export":

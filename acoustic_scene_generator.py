@@ -355,7 +355,7 @@ class ForestAcousticEnvironment:
                 'scene_duration': self.config.scene_duration,
                 'sample_rate': self.config.processing.sample_rate,
                 'frame_size': self.config.processing.frame_size,
-                'hop_length': self.config.hop_length,
+                'hop_length': self.config.processing.hop_length,
                 'environment': self.config.environment.__dict__,
                 'background_noise_level': self.config.background_noise_level
             },
@@ -377,7 +377,7 @@ class ForestAcousticEnvironment:
                 'absorption_coefficient': self.config.environment.absorption_coefficient,
                 'max_order': self.config.environment.max_order,
                 'n_sources': len(self.room.sources),
-                'n_mics': self.room.mic_array.n_mics
+                'n_mics': self.room.mic_array.nmic
             }
         }
         
@@ -413,7 +413,7 @@ class ForestAcousticEnvironment:
             mic_delays = []
             mic_distances = []
             
-            for mic_idx in range(self.room.mic_array.n_mics):
+            for mic_idx in range(self.room.mic_array.nmic):
                 mic_pos = self.room.mic_array.R[:, mic_idx]
                 mic_distance = np.linalg.norm(source_pos - mic_pos)
                 delay = mic_distance / pra.constants.get('c')  # Speed of sound
@@ -423,8 +423,8 @@ class ForestAcousticEnvironment:
             
             # Calculate TDOAs between mic pairs
             tdoas = []
-            for j in range(self.room.mic_array.n_mics):
-                for k in range(j+1, self.room.mic_array.n_mics):
+            for j in range(self.room.mic_array.nmic):
+                for k in range(j+1, self.room.mic_array.nmic):
                     tdoa = mic_delays[k] - mic_delays[j]
                     tdoas.append({
                         'mic_pair': (j, k),
@@ -554,46 +554,6 @@ def save_simulation_results(mic_signals: np.ndarray, metadata: Dict,
     print(f"- Audio files: {scene_id}_mic_[1-4].wav")  
     print(f"- Array data: {scene_id}_all_channels.npy")
     print(f"- Metadata: {scene_id}_metadata.json")
-
-def create_example_config() -> SimulationConfig:
-    """Create example configuration for testing"""
-    
-    sources = [
-        SoundSource(
-            audio_file="sounds/elephant_call.wav",
-            position=(100.0, 0.0, 0.0),  # 100m North
-            start_time=2.0,
-            volume_scale=1.0,
-            source_type="elephant"
-        ),
-        SoundSource(
-            audio_file="sounds/bird_call.wav", 
-            position=(50.0, 50.0, 8.0),  # 50m NE, elevated
-            start_time=0.5,
-            volume_scale=0.7,
-            source_type="bird"
-        )
-    ]
-    
-    ambient = {
-        'wind': AmbientCondition('wind', 12.0, 28.0),
-        'forest_base': AmbientCondition('forest_base', 'medium', 25.0)
-    }
-    
-    return SimulationConfig(
-        scene_duration=10.0,
-        sample_rate=16000,
-        sources=sources,
-        ambient=ambient,
-        background_noise_level=45.0,
-        environment=EnvironmentConfig(
-            room_size=(1000.0, 1000.0, 50.0),  # 1km forest clearing
-            absorption_coefficient=0.02,
-            max_order=2,
-            temperature=25.0,
-            humidity=60.0
-        )
-    )
 
 if __name__ == "__main__":
     # Example usage

@@ -1,11 +1,7 @@
-"""
-Enhanced Configuration Builder for Pyroomacoustics-based Acoustic Scene Simulation
-"""
-
 from acoustic_scene_generator import *
+from models import AmbientType, AmbientCondition, ProcessingConfig
 import json
 from typing import Dict, List
-import argparse
 
 class EnhancedSceneConfigBuilder:
     """Enhanced configuration builder for pyroomacoustics-based simulation"""
@@ -173,17 +169,29 @@ class EnhancedSceneConfigBuilder:
     
     def set_rain(self, intensity: str = "moderate", level_db: float = 35.0):
         """Add rain ambient condition"""
-        self.ambient['rain'] = AmbientCondition('rain', intensity, level_db)
+        self.ambient['rain'] = AmbientCondition(
+            condition_type=AmbientType.RAIN, 
+            intensity=intensity, 
+            level_db=level_db
+        )
         return self
     
     def set_wind(self, speed_kmh: float = 15.0, level_db: float = 30.0):
         """Add wind ambient condition"""
-        self.ambient['wind'] = AmbientCondition('wind', speed_kmh, level_db)
+        self.ambient['wind'] = AmbientCondition(
+            condition_type=AmbientType.WIND, 
+            intensity=speed_kmh, 
+            level_db=level_db
+        )
         return self
     
     def set_forest_ambient(self, level_db: float = 25.0):
         """Add forest base ambient sounds"""
-        self.ambient['forest_base'] = AmbientCondition('forest_base', 'medium', level_db)
+        self.ambient['forest_base'] = AmbientCondition(
+            condition_type=AmbientType.FOREST_BASE, 
+            intensity=1.0,  # Use float value instead of string for forest base
+            level_db=level_db
+        )
         return self
     
     def set_processing_params(self, frame_size: int = 512, hop_length: int = 256):
@@ -204,15 +212,20 @@ class EnhancedSceneConfigBuilder:
     
     def build(self) -> SimulationConfig:
         """Build the final configuration"""
+        # Create processing config with the processing parameters
+        processing_config = ProcessingConfig(
+            sample_rate=self.sample_rate,
+            frame_size=self.frame_size,
+            hop_length=self.hop_length
+        )
+        
         return SimulationConfig(
             scene_duration=self.duration,
-            sample_rate=self.sample_rate,
             sources=self.sources.copy(),
             environment=self.environment,
             ambient=self.ambient.copy(),
             background_noise_level=self.noise_level,
-            frame_size=self.frame_size,
-            hop_length=self.hop_length
+            processing=processing_config
         )
     
     def preview(self):

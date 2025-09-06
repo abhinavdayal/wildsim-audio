@@ -1,0 +1,25 @@
+name: "Simple Elephant Detection"
+duration: 15.0
+sample_rate: 16000
+description: "Single elephant with bird distractor"
+
+sounds:
+  - sound_type: "elephant"
+    dataset: "wild_animals"  # Use from audio_cache
+    distance: 120.0
+    azimuth: 45.0      # Northeast
+    elevation: 0.0
+    start_time: 2.0
+    volume: 1.0
+  
+  - sound_type: "bird"
+    dataset: "birds_sample"
+    distance: 30.0
+    azimuth: 180.0     # South
+    elevation: 5.0
+    start_time: 1.0
+    volume: 0.6
+
+ambient:
+  - sound_type: "forest"
+    level_db: -45.0
