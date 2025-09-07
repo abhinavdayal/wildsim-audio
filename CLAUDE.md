@@ -43,10 +43,10 @@ This is a wildlife acoustic simulation library built on pyroomacoustics for gene
 - Analysis and visualization of results (signals, DOA, scene layout)
 - Export functionality for audio, metadata, and configurations
 
-**Hydra Configuration System (`hydraconf.py`)**:
-- Structured configuration management with YAML files
+**JSON Configuration System**:
+- Scene configuration management with JSON files
 - Predefined scenarios and environment presets
-- Support for experiment sweeps and parameter studies
+- Interactive configuration via Streamlit interface
 - Integration with Pydantic models for validation
 
 **Configuration Builder (`config_builder.py`)**:
@@ -81,13 +81,11 @@ config = (EnhancedSceneConfigBuilder()
     .build())
 ```
 
-**3. Hydra Experiments**:
+**3. Interactive Scene Creation**:
 ```bash
-# Run with configuration files
-uv run python hydraconf.py --config-path=configs --config-name=single_elephant
-
-# Create configuration templates
-uv run python hydraconf.py create-configs
+# Run the Streamlit interface for scene creation
+uv run streamlit run app.py
+# Navigate to Scene Creator tab for interactive configuration
 ```
 
 **4. Simulation Execution**:

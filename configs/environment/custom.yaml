@@ -1,8 +1,0 @@
-# @package environment
-environment_type: custom
-room_size: [1500.0, 1500.0, 75.0]
-absorption_coefficient: 0.05
-max_order: 2
-temperature: 20.0
-humidity: 50.0
-air_absorption: true

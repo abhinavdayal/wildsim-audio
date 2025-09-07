@@ -44,10 +44,10 @@ uv run black .
 - Analysis and visualization of results (signals, DOA, scene layout)
 - Export functionality for audio, metadata, and configurations
 
-### **Hydra Configuration System (`hydraconf.py`)**
-- Structured configuration management with YAML files
+### **JSON Configuration System**
+- Scene configuration management with JSON files
 - Predefined scenarios and environment presets
-- Support for experiment sweeps and parameter studies
+- Interactive configuration via Streamlit interface
 - Integration with Pydantic models for validation
 
 ### **Configuration Builder (`config_builder.py`)**
@@ -79,6 +79,41 @@ uv run black .
 - Precise TDOA values between all microphone pairs
 - Distance and SNR information
 - Perfect validation data for your algorithms
+
+## Sound Timing and Placement System
+
+The simulation system handles temporal placement of sounds within scenes using a sophisticated timing mechanism:
+
+### Start Time Selection
+- **Directional animal sounds**: Randomly placed between 0 and `(scene_duration - 5)` seconds
+- **Elephant sounds**: Randomly placed between 0 and `(scene_duration - 8)` seconds  
+- This ensures sounds have sufficient time to complete before scene ends
+
+### Audio Duration Handling
+- Individual animal sounds maintain their **natural duration** (typically 2-10 seconds)
+- Sounds are **not** artificially stretched to fill remaining scene time
+- If a 5-second bird call starts at second 20 in a 30-second scene, it ends naturally at second 25
+
+### Multiple Sound Overlap
+- Multiple sounds can overlap naturally (e.g., bird call at 5s, elephant at 7s)
+- Each sound maintains independent acoustic characteristics
+- Pyroomacoustics handles realistic acoustic propagation and summation at each microphone
+
+### Example Timeline (30-second scene)
+```
+0-30s: Ambient forest sounds (continuous, looped)
+2-7s:  Bird call (45° azimuth, 80m distance)
+12-18s: Elephant trumpet (120° azimuth, 150m distance)  
+25-28s: Monkey call (270° azimuth, 60m distance)
+```
+
+### Technical Implementation
+The system uses pyroomacoustics' `delay` parameter for precise temporal control:
+```python
+room.add_source(position, signal=audio, delay=start_time)
+```
+
+This creates naturalistic acoustic scenes where discrete animal vocalizations occur sporadically within continuous ambient soundscapes, exactly as heard in real forest environments.
 
 ## Quick Start
 
@@ -129,13 +164,11 @@ simulator = WildlifeAcousticSimulator()
 mic_signals, metadata = simulator.simulate_scene(config)
 ```
 
-#### Using Hydra for Experiments
+#### Using Streamlit Interface
 ```bash
-# Run with configuration files
-uv run python hydraconf.py --config-path=configs --config-name=single_elephant
-
-# Create configuration templates
-uv run python hydraconf.py create-configs
+# Run interactive scene creator and simulator
+uv run streamlit run app.py
+# Navigate to Scene Creator tab for interactive configuration and simulation
 ```
 
 ### 3. Demo and Examples
@@ -150,7 +183,7 @@ uv run python integration_test.py
 ## Research Workflow
 
 1. **Dataset Setup**: Use Streamlit interface or `DatasetManager` class to add audio datasets
-2. **Configuration**: Create scenarios using Pydantic models, fluent builder, or Hydra configs
+2. **Configuration**: Create scenarios using Pydantic models, fluent builder, or Streamlit interface
 3. **Simulation**: Execute via web interface or programmatically
 4. **Analysis**: Compare DOA algorithms (MUSIC, SRP-PHAT, FRIDA) against ground truth
 5. **Validation**: Analyze estimation errors, signal quality, and scene visualization
@@ -161,7 +194,7 @@ Built on modern Python scientific stack:
 - **pyroomacoustics** - 3D acoustic simulation engine
 - **pydantic** - Type-safe configuration validation
 - **streamlit** - Interactive web interface
-- **hydra-core** - Advanced configuration management
+- **json** - Configuration file management
 - **librosa** - Audio processing and analysis
 - **numpy/scipy** - Numerical computing
 - **matplotlib/plotly** - Visualization and analysis

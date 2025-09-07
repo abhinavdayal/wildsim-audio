@@ -167,7 +167,7 @@ class SimpleSimulator:
             sound_position_centered = [
                 sound.position[0] + room_size[0]/2,
                 sound.position[1] + room_size[1]/2, 
-                sound.position[2] + 50  # 50m above ground
+                sound.position[2]
             ]
             
             # Add sound source to room
@@ -210,16 +210,59 @@ class SimpleSimulator:
         else:
             print("Warning: No signals generated")
         
-        # Add ambient noise
+        # Add ambient sounds (using actual audio files, not white noise)
         for ambient in config.ambient:
-            noise_level_linear = 10**(ambient.level_db / 20)
-            noise = np.random.normal(0, noise_level_linear, (4, total_samples))
-            mic_signals += noise
+            if ambient.audio_file and Path(ambient.audio_file).exists():
+                try:
+                    # Load ambient audio file
+                    ambient_audio = self.load_audio_file(ambient.audio_file, config.sample_rate, config.duration)
+                    
+                    # Convert dB level to linear scale
+                    level_linear = 10**(ambient.level_db / 20)
+                    ambient_audio = ambient_audio * level_linear
+                    
+                    # Ensure ambient audio is the right length
+                    if len(ambient_audio) > total_samples:
+                        ambient_audio = ambient_audio[:total_samples]
+                    elif len(ambient_audio) < total_samples:
+                        # Loop the ambient audio to fill the scene duration
+                        repeats = (total_samples // len(ambient_audio)) + 1
+                        ambient_audio = np.tile(ambient_audio, repeats)[:total_samples]
+                    
+                    # Add ambient audio to all microphones (non-directional)
+                    for mic_idx in range(4):
+                        mic_signals[mic_idx] += ambient_audio
+                        
+                    print(f"✓ Added ambient: {Path(ambient.audio_file).name} at {ambient.level_db:.1f}dB")
+                        
+                except Exception as e:
+                    print(f"⚠️  Could not load ambient audio {ambient.audio_file}: {e}")
+                    # Fallback to low-level noise only if audio fails
+                    noise_level_linear = 10**(ambient.level_db / 20) * 0.1  # Much quieter fallback
+                    noise = np.random.normal(0, noise_level_linear, (4, total_samples))
+                    mic_signals += noise
+            else:
+                # Procedural ambient (very low level background)
+                noise_level_linear = 10**(ambient.level_db / 20) * 0.2  # Quiet procedural background
+                noise = np.random.normal(0, noise_level_linear, (4, total_samples))
+                mic_signals += noise
+                print(f"✓ Added procedural ambient: {ambient.sound_type} at {ambient.level_db:.1f}dB")
         
-        # Final normalization to prevent clipping
+        # Gentle normalization to prevent clipping while preserving volume differences
         max_val = np.max(np.abs(mic_signals))
         if max_val > 0.95:
+            # Only normalize if very close to clipping, preserving relative volumes
             mic_signals = mic_signals * (0.95 / max_val)
+            print(f"✓ Gentle normalization (clipping prevention): max level {max_val:.3f} → 0.95")
+        elif max_val < 0.001:
+            # Handle very quiet signals
+            print(f"⚠️ Very quiet signal: max level {max_val:.6f} - check volume settings")
+        else:
+            print(f"✓ No normalization needed: max level {max_val:.3f} (preserving volume differences)")
+        
+        # Calculate final SNR for verification
+        signal_power = np.mean(np.abs(mic_signals))
+        print(f"✓ Final signal level: {signal_power:.4f} (linear), {20*np.log10(signal_power):.1f}dB")
         
         print(f"✓ Simulation complete. Output shape: {mic_signals.shape}")
         

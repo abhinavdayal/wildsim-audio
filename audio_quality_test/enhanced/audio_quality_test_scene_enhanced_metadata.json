@@ -1,0 +1,167 @@
+{
+  "config": {
+    "name": "Audio Quality Test Scene",
+    "duration": 10.0,
+    "sounds": [
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/elephants_sample/Ys_ele146.wav",
+        "position": [
+          80.0,
+          45.0,
+          1.5
+        ],
+        "distance": 91.80005446621477,
+        "azimuth": 60.64224645720873,
+        "elevation": 0.9362466568616105,
+        "start_time": 1.0,
+        "volume": 1.0,
+        "sound_type": "elephant"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/forest/audio/birdchirping37.wav",
+        "position": [
+          25.0,
+          -30.0,
+          3.0
+        ],
+        "distance": 39.16631205513228,
+        "azimuth": 140.19442890773482,
+        "elevation": 4.392955384314265,
+        "start_time": 3.0,
+        "volume": 1.0,
+        "sound_type": "bird"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/forest/audio/birdchirping23.wav",
+        "position": [
+          150.0,
+          90.0,
+          5.0
+        ],
+        "distance": 175.0,
+        "azimuth": 59.03624346792648,
+        "elevation": 1.6372450777777654,
+        "start_time": 5.0,
+        "volume": 0.7,
+        "sound_type": "bird"
+      }
+    ],
+    "ambient": [
+      {
+        "sound_type": "forest_background",
+        "level_db": -40.0,
+        "audio_file": null
+      }
+    ],
+    "sample_rate": 16000,
+    "description": "Test scene for comparing audio quality between simulators"
+  },
+  "mic_positions": [
+    [
+      -0.032,
+      0.0,
+      0.032,
+      0.0
+    ],
+    [
+      0.0,
+      -0.032,
+      0.0,
+      0.032
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  ],
+  "sample_rate": 16000,
+  "duration": 10.0,
+  "sounds": [
+    {
+      "index": 0,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/elephants_sample/Ys_ele146.wav",
+      "position": [
+        80.0,
+        45.0,
+        1.5
+      ],
+      "distance": 91.80005446621477,
+      "azimuth": 60.64224645720873,
+      "elevation": 0.9362466568616105,
+      "start_time": 1.0,
+      "volume": 1.0,
+      "sound_type": "elephant",
+      "duration": 1.9800625,
+      "audio_dynamics": {
+        "original_rms": 0.0776386559009552,
+        "original_max": 0.520721435546875,
+        "dynamic_range": 6.706986904144287,
+        "final_rms": 0.0776386559009552,
+        "final_max": 0.520721435546875
+      }
+    },
+    {
+      "index": 1,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/forest/audio/birdchirping37.wav",
+      "position": [
+        25.0,
+        -30.0,
+        3.0
+      ],
+      "distance": 39.16631205513228,
+      "azimuth": 140.19442890773482,
+      "elevation": 4.392955384314265,
+      "start_time": 3.0,
+      "volume": 1.0,
+      "sound_type": "bird",
+      "duration": 5.0,
+      "audio_dynamics": {
+        "original_rms": 0.010206744074821472,
+        "original_max": 0.05277838557958603,
+        "dynamic_range": 5.170932769775391,
+        "final_rms": 0.010206744074821472,
+        "final_max": 0.05277838557958603
+      }
+    },
+    {
+      "index": 2,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/forest/audio/birdchirping23.wav",
+      "position": [
+        150.0,
+        90.0,
+        5.0
+      ],
+      "distance": 175.0,
+      "azimuth": 59.03624346792648,
+      "elevation": 1.6372450777777654,
+      "start_time": 5.0,
+      "volume": 0.7,
+      "sound_type": "bird",
+      "duration": 5.0,
+      "audio_dynamics": {
+        "original_rms": 0.012241126038134098,
+        "original_max": 0.08166462182998657,
+        "dynamic_range": 6.671332359313965,
+        "final_rms": 0.012241126038134098,
+        "final_max": 0.08166462182998657
+      }
+    }
+  ],
+  "audio_processing": {
+    "dynamics_preserved": true,
+    "realistic_ambient": true,
+    "forest_absorption": 0.7
+  },
+  "final_levels": {
+    "max_amplitude": 0.01151176967509099,
+    "rms_levels": [
+      0.0015534069987758724,
+      0.0015537630799121768,
+      0.0015546534812537283,
+      0.0015544260142060671
+    ],
+    "dynamic_range": 7.407533302532018
+  }
+}

@@ -1,6 +1,0 @@
-# @package processing
-# High resolution for detailed analysis
-sample_rate: 48000
-frame_size: 2048
-hop_length: 512
-window_type: "hann"

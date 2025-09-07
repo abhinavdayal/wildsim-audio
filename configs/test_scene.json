@@ -1,0 +1,43 @@
+{
+  "name": "Test Scene",
+  "duration": 10.0,
+  "sounds": [
+    {
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/forest/audio/insect70.wav",
+      "position": [
+        70.71067811865474,
+        70.71067811865476,
+        0.0
+      ],
+      "distance": 99.99999999999999,
+      "azimuth": 44.99999999999999,
+      "elevation": 0.0,
+      "start_time": 0.0,
+      "volume": 1.0,
+      "sound_type": "insect70.wav"
+    },
+    {
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/wild_animals/Animal-Soundprepros/Elephant/elephant45.wav",
+      "position": [
+        43.30127018922194,
+        -24.999999999999993,
+        0.0
+      ],
+      "distance": 50.0,
+      "azimuth": 119.99999999999999,
+      "elevation": 0.0,
+      "start_time": 0.0,
+      "volume": 1.0,
+      "sound_type": "elephant45.wav"
+    }
+  ],
+  "ambient": [
+    {
+      "sound_type": "forest",
+      "level_db": -45.0,
+      "audio_file": null
+    }
+  ],
+  "sample_rate": 16000,
+  "description": ""
+}

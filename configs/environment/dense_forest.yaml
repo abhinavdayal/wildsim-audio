@@ -1,8 +1,0 @@
-# @package environment  
-environment_type: dense_forest
-room_size: [800.0, 800.0, 30.0]
-absorption_coefficient: 0.08
-max_order: 3
-temperature: 22.0
-humidity: 75.0
-air_absorption: true

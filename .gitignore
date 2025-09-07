@@ -207,6 +207,7 @@ marimo/_lsp/
 __marimo__/
 
 output/
+outputs/
 temp/
 audio_cache/
 *.log

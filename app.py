@@ -22,6 +22,7 @@ from models import *
 from dataset_manager import DatasetManager, SmartAudioSelector
 from auth_helpers import *
 from scene_creator import render_scene_creator_tab
+from scene_generator_ui import render_scene_generator_page
 import pyroomacoustics as pra
 
 # Page configuration
@@ -1447,6 +1448,7 @@ def sidebar_navigation():
         "🏠 Home": "home",
         "📊 Dataset Manager": "datasets",
         "🎬 Scene Creator": "scene_creator",
+        "🤖 Scene Generator": "scene_generator",
         "📈 Analysis": "analysis",
         "💾 Export/Import": "export",
         "📚 Help": "help"
@@ -1573,11 +1575,40 @@ def main():
     # Route to appropriate page
     if page == "home":
         st.markdown("### Welcome to the Wildlife Acoustic Scene Simulator!")
-        st.markdown("Use the sidebar to navigate to different sections of the application.")
+        st.markdown("""
+        A comprehensive toolkit for generating realistic acoustic scenes for wildlife monitoring research.
+        
+        #### 🎯 **Available Tools**
+        
+        **📊 Dataset Manager**: Add and manage audio datasets from Kaggle, Google Drive, or local files.
+        
+        **🎬 Scene Creator**: Interactively create individual acoustic scenes with precise sound placement and preview.
+        
+        **🤖 Scene Generator**: Generate large datasets (100s-1000s) of elephant detection scenes automatically with:
+        - Configurable positive/negative sample ratios
+        - Physics-based sound positioning with height constraints
+        - Realistic ambient background sounds
+        - 4-microphone array audio output
+        - JSONL configuration format for machine learning workflows
+        
+        **📈 Analysis**: Visualize and analyze simulation results with DOA estimation and signal processing tools.
+        
+        **💾 Export/Import**: Save and load scene configurations, export audio files and metadata.
+        
+        #### 🚀 **Quick Start for ML Training Data**
+        1. **Dataset Manager** → Add your audio datasets
+        2. **Scene Generator** → Generate training scenes with elephant detection labels
+        3. **Analysis** → Validate generated scenes and ground truth
+        
+        Perfect for training machine learning models for wildlife acoustic monitoring!
+        """)
     elif page == "datasets":
         dataset_manager_page()
     elif page == "scene_creator":
         scene_creator_page()
+    elif page == "scene_generator":
+        dataset_manager = DatasetManager()
+        render_scene_generator_page(dataset_manager)
     elif page == "analysis":
         analysis_page()
     elif page == "export":

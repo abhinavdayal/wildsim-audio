@@ -1,6 +1,0 @@
-# @package processing
-# Optimized for real-time processing
-sample_rate: 16000
-frame_size: 256
-hop_length: 128
-window_type: "hann"
