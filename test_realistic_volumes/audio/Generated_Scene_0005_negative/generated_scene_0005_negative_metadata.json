@@ -1,0 +1,1401 @@
+{
+  "config": {
+    "name": "Generated_Scene_0005_negative",
+    "duration": 30.0,
+    "sounds": [
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Andean Guan15.mp3",
+        "position": [
+          33.42101832003252,
+          78.43193987374325,
+          30.483698221724996
+        ],
+        "distance": 90.54164519810553,
+        "azimuth": 23.079576493024796,
+        "elevation": 19.67482244947887,
+        "start_time": 5.853495210597473,
+        "volume": 0.01,
+        "sound_type": "bird"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/wild_animals/Animal-Soundprepros/Aslan/lion22.wav",
+        "position": [
+          -88.89186293969821,
+          55.70104565930176,
+          0.17978111610182768
+        ],
+        "distance": 104.90186893320546,
+        "azimuth": 302.0719081162259,
+        "elevation": 0.09819371509720135,
+        "start_time": 7.437694798837716,
+        "volume": 0.01,
+        "sound_type": "lion"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/wild_animals/Animal-Soundprepros/Aslan/lion32.wav",
+        "position": [
+          -12.655920238136117,
+          54.789928947155765,
+          0.3573116138014635
+        ],
+        "distance": 56.233764792140654,
+        "azimuth": 346.9933796174372,
+        "elevation": 0.3640621480444355,
+        "start_time": 2.1029850004719854,
+        "volume": 0.10505726985253434,
+        "sound_type": "lion"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Tataupa Tinamou18.mp3",
+        "position": [
+          43.03035736455079,
+          10.404707377024723,
+          31.574559675637527
+        ],
+        "distance": 54.37667155345993,
+        "azimuth": 76.40683267501578,
+        "elevation": 35.49723779998488,
+        "start_time": 6.433059798069799,
+        "volume": 0.01,
+        "sound_type": "bird"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/forest/audio/lion33.wav",
+        "position": [
+          64.92702257849896,
+          86.01007643259129,
+          0.6734483101928899
+        ],
+        "distance": 107.76690141910738,
+        "azimuth": 37.048313070412256,
+        "elevation": 0.35805053805135795,
+        "start_time": 19.26469968206383,
+        "volume": 0.01,
+        "sound_type": "lion"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/wild_animals/Animal-Soundprepros/Aslan/lion27.wav",
+        "position": [
+          14.847861746432049,
+          59.38764276558013,
+          0.6473714745976274
+        ],
+        "distance": 61.21903463400452,
+        "azimuth": 14.03710704602552,
+        "elevation": 0.6058956142691037,
+        "start_time": 15.21116603054895,
+        "volume": 0.03189528122382522,
+        "sound_type": "lion"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/forest/audio/lion75.wav",
+        "position": [
+          26.697561703029255,
+          31.043009039854045,
+          0.8677421427666101
+        ],
+        "distance": 40.95340263716615,
+        "azimuth": 40.69613996397604,
+        "elevation": 1.2141038402674285,
+        "start_time": 4.266728953859456,
+        "volume": 0.156855956147782,
+        "sound_type": "lion"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Marail Guan4.mp3",
+        "position": [
+          39.38738479229971,
+          -45.434734405828614,
+          49.79857590380797
+        ],
+        "distance": 78.074191211643,
+        "azimuth": 139.07797332609724,
+        "elevation": 39.630687990751426,
+        "start_time": 11.461985194088465,
+        "volume": 0.01,
+        "sound_type": "bird"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Cinereous Tinamou30.mp3",
+        "position": [
+          29.73101755832187,
+          84.27445382574871,
+          41.855185966256336
+        ],
+        "distance": 98.68117127877737,
+        "azimuth": 19.43223117132533,
+        "elevation": 25.096595531546036,
+        "start_time": 21.80708823375783,
+        "volume": 0.01,
+        "sound_type": "bird"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Andean Guan15.mp3",
+        "position": [
+          -20.78899237243455,
+          -19.769491532891283,
+          14.793359810862961
+        ],
+        "distance": 32.27783285513229,
+        "azimuth": 226.43991568832203,
+        "elevation": 27.278320719344666,
+        "start_time": 15.523718713495715,
+        "volume": 0.020382363999598772,
+        "sound_type": "bird"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/wild_animals/Animal-Soundprepros/Aslan/lion15.wav",
+        "position": [
+          -139.82527192163835,
+          -22.993170238611537,
+          0.1132678072406802
+        ],
+        "distance": 141.7032299391162,
+        "azimuth": 260.6617322665531,
+        "elevation": 0.045798306809701726,
+        "start_time": 14.642338731789255,
+        "volume": 0.01,
+        "sound_type": "lion"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Cinereous Tinamou30.mp3",
+        "position": [
+          0.8134404222717275,
+          22.105199496779544,
+          44.41137282541209
+        ],
+        "distance": 49.61523522418048,
+        "azimuth": 2.107453627655017,
+        "elevation": 63.52328672215546,
+        "start_time": 11.442228705334575,
+        "volume": 0.08638002468755898,
+        "sound_type": "bird"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Grey Tinamou15.mp3",
+        "position": [
+          76.19816996245113,
+          -56.03353002166774,
+          49.78102694627445
+        ],
+        "distance": 106.88343293579895,
+        "azimuth": 126.3294925511952,
+        "elevation": 27.758812791371614,
+        "start_time": 15.064224246077057,
+        "volume": 0.01,
+        "sound_type": "bird"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Cinereous Tinamou30.mp3",
+        "position": [
+          33.20550492291099,
+          68.96134049990685,
+          31.886785613152412
+        ],
+        "distance": 82.91585576636535,
+        "azimuth": 25.711232938568614,
+        "elevation": 22.616924389612812,
+        "start_time": 9.944764932238407,
+        "volume": 0.01,
+        "sound_type": "bird"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Cinereous Tinamou30.mp3",
+        "position": [
+          74.85877880000679,
+          36.835997035383365,
+          10.616291124567578
+        ],
+        "distance": 84.10370430760283,
+        "azimuth": 63.79943846791316,
+        "elevation": 7.25171022485989,
+        "start_time": 21.493315620097906,
+        "volume": 0.01,
+        "sound_type": "bird"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/wild_animals/Animal-Soundprepros/Aslan/lion30.wav",
+        "position": [
+          18.474602709330384,
+          -31.770645825622136,
+          1.540024662958234
+        ],
+        "distance": 36.783917102549566,
+        "azimuth": 149.8220363930334,
+        "elevation": 2.3994919030120183,
+        "start_time": 21.068796114254916,
+        "volume": 0.29043351780775734,
+        "sound_type": "lion"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Tataupa Tinamou18.mp3",
+        "position": [
+          81.89495248079999,
+          -26.371583742045054,
+          35.016289648739004
+        ],
+        "distance": 92.88909630123747,
+        "azimuth": 107.84945173779857,
+        "elevation": 22.146048064759803,
+        "start_time": 6.560068863372362,
+        "volume": 0.01,
+        "sound_type": "bird"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Andean Guan15.mp3",
+        "position": [
+          10.555055887657002,
+          18.05382830878428,
+          30.87299538776359
+        ],
+        "distance": 37.2892982718567,
+        "azimuth": 30.312419733092792,
+        "elevation": 55.88686509841727,
+        "start_time": 7.274979529587672,
+        "volume": 0.0910992227665009,
+        "sound_type": "bird"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Marail Guan4.mp3",
+        "position": [
+          -4.4880862976597475,
+          -14.811723963581723,
+          21.51468266720823
+        ],
+        "distance": 26.50304993126739,
+        "azimuth": 196.85728307913854,
+        "elevation": 54.27034479375077,
+        "start_time": 14.391301069284737,
+        "volume": 0.09328863123890198,
+        "sound_type": "bird"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Cinereous Tinamou30.mp3",
+        "position": [
+          41.24946065042624,
+          -61.97453028627418,
+          37.43797489006947
+        ],
+        "distance": 83.33044084861696,
+        "azimuth": 146.3527680611046,
+        "elevation": 26.696940460647102,
+        "start_time": 6.860183898048381,
+        "volume": 0.01,
+        "sound_type": "bird"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Cinereous Tinamou30.mp3",
+        "position": [
+          29.560172830991036,
+          50.94415184219801,
+          5.413123113454359
+        ],
+        "distance": 59.147378019320534,
+        "azimuth": 30.124306184863133,
+        "elevation": 5.251013910687536,
+        "start_time": 0.20808394750543024,
+        "volume": 0.01,
+        "sound_type": "bird"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Cinereous Tinamou30.mp3",
+        "position": [
+          15.568461038285205,
+          -18.1992900502496,
+          17.96952429875608
+        ],
+        "distance": 29.94152536123208,
+        "azimuth": 139.45488720911976,
+        "elevation": 36.88092330350606,
+        "start_time": 8.89777270098123,
+        "volume": 0.027014526551614442,
+        "sound_type": "bird"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Andean Guan15.mp3",
+        "position": [
+          -69.76538217511958,
+          32.48785694862106,
+          44.09838977562831
+        ],
+        "distance": 88.69801226610322,
+        "azimuth": 294.97012564627835,
+        "elevation": 29.81324173174722,
+        "start_time": 8.945260820364561,
+        "volume": 0.01,
+        "sound_type": "bird"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/forest/audio/lion15.wav",
+        "position": [
+          45.74894902844125,
+          -8.181741506407636,
+          1.6521769867107747
+        ],
+        "distance": 46.50416024486418,
+        "azimuth": 100.13958279301902,
+        "elevation": 2.036004803031662,
+        "start_time": 1.4182302087086651,
+        "volume": 0.1327179525869705,
+        "sound_type": "lion"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Andean Guan15.mp3",
+        "position": [
+          -54.238766377087636,
+          6.92572617675372,
+          6.670338113731682
+        ],
+        "distance": 55.0845066396638,
+        "azimuth": 277.2766974865105,
+        "elevation": 6.955176370944442,
+        "start_time": 0.9320667438094649,
+        "volume": 0.01,
+        "sound_type": "bird"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/wild_animals/Animal-Soundprepros/Aslan/lion48.wav",
+        "position": [
+          14.475743393750001,
+          53.220990654400445,
+          2.936905324525222
+        ],
+        "distance": 55.232657060136994,
+        "azimuth": 15.21595976789928,
+        "elevation": 3.0480459495092336,
+        "start_time": 12.591680051851833,
+        "volume": 0.057862761384860295,
+        "sound_type": "lion"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/forest/audio/lion58.wav",
+        "position": [
+          65.56263418899185,
+          -7.584044897810036,
+          2.511838268480939
+        ],
+        "distance": 66.04760457653681,
+        "azimuth": 96.59843851402638,
+        "elevation": 2.179525621838391,
+        "start_time": 22.035988939668538,
+        "volume": 0.018099376691775037,
+        "sound_type": "lion"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Tataupa Tinamou18.mp3",
+        "position": [
+          12.531968311400608,
+          31.82988953020021,
+          42.406599266812364
+        ],
+        "distance": 54.48405049772556,
+        "azimuth": 21.49040257305695,
+        "elevation": 51.107972371860576,
+        "start_time": 1.3443786284689092,
+        "volume": 0.01,
+        "sound_type": "bird"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/forest/audio/lion74.wav",
+        "position": [
+          -108.7629006336326,
+          66.29366435581882,
+          1.4338925247335794
+        ],
+        "distance": 127.38239492071064,
+        "azimuth": 301.36333556375627,
+        "elevation": 0.6449692291010515,
+        "start_time": 19.260929110839513,
+        "volume": 0.01,
+        "sound_type": "lion"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/wild_animals/Animal-Soundprepros/Aslan/lion15.wav",
+        "position": [
+          -101.97026530797082,
+          26.01935875978501,
+          1.6428137421704414
+        ],
+        "distance": 105.25037232352112,
+        "azimuth": 284.3144892995677,
+        "elevation": 0.8943447351246079,
+        "start_time": 22.771609992402876,
+        "volume": 0.01,
+        "sound_type": "lion"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Andean Guan15.mp3",
+        "position": [
+          -49.90170361694482,
+          8.39558179500852,
+          41.389750956927934
+        ],
+        "distance": 65.37413327782328,
+        "azimuth": 279.5501418372403,
+        "elevation": 39.280777671697656,
+        "start_time": 5.37872691171647,
+        "volume": 0.01,
+        "sound_type": "bird"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Marail Guan4.mp3",
+        "position": [
+          69.84926412667556,
+          2.211295006401744,
+          37.142095464190156
+        ],
+        "distance": 79.14129630044253,
+        "azimuth": 88.18673008059945,
+        "elevation": 27.989757253470533,
+        "start_time": 12.792746705096059,
+        "volume": 0.01,
+        "sound_type": "bird"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Tataupa Tinamou18.mp3",
+        "position": [
+          -63.44281339110903,
+          -39.19674428078562,
+          39.18045538452989
+        ],
+        "distance": 84.24062806823986,
+        "azimuth": 238.29106804788552,
+        "elevation": 27.71680106995133,
+        "start_time": 3.2584142622273493,
+        "volume": 0.01,
+        "sound_type": "bird"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Andean Guan15.mp3",
+        "position": [
+          65.88849031784801,
+          -70.06554931494048,
+          27.695368735841633
+        ],
+        "distance": 100.08750075101156,
+        "azimuth": 136.7598049214653,
+        "elevation": 16.06403812394697,
+        "start_time": 13.383357466294443,
+        "volume": 0.01,
+        "sound_type": "bird"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Marail Guan4.mp3",
+        "position": [
+          68.32733742560328,
+          -70.21295831495316,
+          17.599869024500155
+        ],
+        "distance": 99.54014237828453,
+        "azimuth": 135.77978358251158,
+        "elevation": 10.184109353035302,
+        "start_time": 21.103804482271364,
+        "volume": 0.01,
+        "sound_type": "bird"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/forest/audio/lion17.wav",
+        "position": [
+          57.91401335661131,
+          13.11005392947605,
+          1.1389992293462836
+        ],
+        "distance": 59.39026668022274,
+        "azimuth": 77.24487031915739,
+        "elevation": 1.0988980769328065,
+        "start_time": 4.059413654485327,
+        "volume": 0.03120235964406648,
+        "sound_type": "lion"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/forest/audio/lion37.wav",
+        "position": [
+          -131.56682558092965,
+          39.263843580265835,
+          0.16824188478171942
+        ],
+        "distance": 137.30079137233747,
+        "azimuth": 286.6168239507963,
+        "elevation": 0.07020755125481618,
+        "start_time": 16.033435963804006,
+        "volume": 0.01,
+        "sound_type": "lion"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Grey Tinamou15.mp3",
+        "position": [
+          2.2305883430895697,
+          26.440874727351833,
+          15.10479677439297
+        ],
+        "distance": 30.532773642424825,
+        "azimuth": 4.8221324775659005,
+        "elevation": 29.650474464530856,
+        "start_time": 14.29030152107362,
+        "volume": 0.048815311500653685,
+        "sound_type": "bird"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Marail Guan4.mp3",
+        "position": [
+          33.39349209102245,
+          -43.58501888740329,
+          38.43694497523327
+        ],
+        "distance": 67.02371165846897,
+        "azimuth": 142.54178185894017,
+        "elevation": 34.993449955634105,
+        "start_time": 16.174136921760578,
+        "volume": 0.01,
+        "sound_type": "bird"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Andean Guan15.mp3",
+        "position": [
+          22.99701988093486,
+          -43.17770642282365,
+          45.57759941902379
+        ],
+        "distance": 66.86175905658374,
+        "azimuth": 151.9596423618254,
+        "elevation": 42.97421552363138,
+        "start_time": 5.990797993905295,
+        "volume": 0.01,
+        "sound_type": "bird"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Cinereous Tinamou30.mp3",
+        "position": [
+          -61.23212688970024,
+          50.2042853869572,
+          44.68648143774851
+        ],
+        "distance": 90.92153352170011,
+        "azimuth": 309.34836261636997,
+        "elevation": 29.438169115418123,
+        "start_time": 6.160603288186062,
+        "volume": 0.01,
+        "sound_type": "bird"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/wild_animals/Animal-Soundprepros/Aslan/lion48.wav",
+        "position": [
+          69.24307341116652,
+          89.38379586896062,
+          2.5194265486125915
+        ],
+        "distance": 113.09471114734795,
+        "azimuth": 37.76392116148156,
+        "elevation": 1.276491613882972,
+        "start_time": 20.66125183409106,
+        "volume": 0.01,
+        "sound_type": "lion"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Marail Guan4.mp3",
+        "position": [
+          19.63078187175377,
+          -9.055031462850177,
+          47.353657821520386
+        ],
+        "distance": 52.05506796429356,
+        "azimuth": 114.7623160483253,
+        "elevation": 65.46170688019812,
+        "start_time": 20.932567879632035,
+        "volume": 0.07053774053845854,
+        "sound_type": "bird"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/forest/audio/lion64.wav",
+        "position": [
+          65.61382404789593,
+          23.440829791380917,
+          0.4314382949700092
+        ],
+        "distance": 69.67662840938203,
+        "azimuth": 70.34050626687468,
+        "elevation": 0.3547782369978792,
+        "start_time": 16.050407342875207,
+        "volume": 0.014497011655055193,
+        "sound_type": "lion"
+      },
+      {
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/forest/audio/lion49.wav",
+        "position": [
+          61.36033504996124,
+          -39.06800857057709,
+          2.9732361962861207
+        ],
+        "distance": 72.80274819395964,
+        "azimuth": 122.48482991046683,
+        "elevation": 2.340588510102158,
+        "start_time": 10.904394889531094,
+        "volume": 0.018676908396030173,
+        "sound_type": "lion"
+      }
+    ],
+    "ambient": [
+      {
+        "sound_type": "rain",
+        "level_db": -47.38413221848522,
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/forest/audio/rain10.wav"
+      },
+      {
+        "sound_type": "rain",
+        "level_db": -38.84751728729602,
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/forest/audio/rain73.wav"
+      },
+      {
+        "sound_type": "rain",
+        "level_db": -45.533089457766664,
+        "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/forest/audio/rain51.wav"
+      }
+    ],
+    "sample_rate": 16000,
+    "description": ""
+  },
+  "mic_positions": [
+    [
+      -0.032,
+      0.0,
+      0.032,
+      0.0
+    ],
+    [
+      0.0,
+      -0.032,
+      0.0,
+      0.032
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  ],
+  "sample_rate": 16000,
+  "duration": 30.0,
+  "sounds": [
+    {
+      "index": 0,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Andean Guan15.mp3",
+      "position": [
+        33.42101832003252,
+        78.43193987374325,
+        30.483698221724996
+      ],
+      "distance": 90.54164519810553,
+      "azimuth": 23.079576493024796,
+      "elevation": 19.67482244947887,
+      "start_time": 5.853495210597473,
+      "volume": 0.01,
+      "sound_type": "bird",
+      "duration": 22.7788125
+    },
+    {
+      "index": 1,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/wild_animals/Animal-Soundprepros/Aslan/lion22.wav",
+      "position": [
+        -88.89186293969821,
+        55.70104565930176,
+        0.17978111610182768
+      ],
+      "distance": 104.90186893320546,
+      "azimuth": 302.0719081162259,
+      "elevation": 0.09819371509720135,
+      "start_time": 7.437694798837716,
+      "volume": 0.01,
+      "sound_type": "lion",
+      "duration": 1.76475
+    },
+    {
+      "index": 2,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/wild_animals/Animal-Soundprepros/Aslan/lion32.wav",
+      "position": [
+        -12.655920238136117,
+        54.789928947155765,
+        0.3573116138014635
+      ],
+      "distance": 56.233764792140654,
+      "azimuth": 346.9933796174372,
+      "elevation": 0.3640621480444355,
+      "start_time": 2.1029850004719854,
+      "volume": 0.10505726985253434,
+      "sound_type": "lion",
+      "duration": 3.669375
+    },
+    {
+      "index": 3,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Tataupa Tinamou18.mp3",
+      "position": [
+        43.03035736455079,
+        10.404707377024723,
+        31.574559675637527
+      ],
+      "distance": 54.37667155345993,
+      "azimuth": 76.40683267501578,
+      "elevation": 35.49723779998488,
+      "start_time": 6.433059798069799,
+      "volume": 0.01,
+      "sound_type": "bird",
+      "duration": 20.023
+    },
+    {
+      "index": 4,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/forest/audio/lion33.wav",
+      "position": [
+        64.92702257849896,
+        86.01007643259129,
+        0.6734483101928899
+      ],
+      "distance": 107.76690141910738,
+      "azimuth": 37.048313070412256,
+      "elevation": 0.35805053805135795,
+      "start_time": 19.26469968206383,
+      "volume": 0.01,
+      "sound_type": "lion",
+      "duration": 5.0
+    },
+    {
+      "index": 5,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/wild_animals/Animal-Soundprepros/Aslan/lion27.wav",
+      "position": [
+        14.847861746432049,
+        59.38764276558013,
+        0.6473714745976274
+      ],
+      "distance": 61.21903463400452,
+      "azimuth": 14.03710704602552,
+      "elevation": 0.6058956142691037,
+      "start_time": 15.21116603054895,
+      "volume": 0.03189528122382522,
+      "sound_type": "lion",
+      "duration": 1.6665
+    },
+    {
+      "index": 6,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/forest/audio/lion75.wav",
+      "position": [
+        26.697561703029255,
+        31.043009039854045,
+        0.8677421427666101
+      ],
+      "distance": 40.95340263716615,
+      "azimuth": 40.69613996397604,
+      "elevation": 1.2141038402674285,
+      "start_time": 4.266728953859456,
+      "volume": 0.156855956147782,
+      "sound_type": "lion",
+      "duration": 5.0
+    },
+    {
+      "index": 7,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Marail Guan4.mp3",
+      "position": [
+        39.38738479229971,
+        -45.434734405828614,
+        49.79857590380797
+      ],
+      "distance": 78.074191211643,
+      "azimuth": 139.07797332609724,
+      "elevation": 39.630687990751426,
+      "start_time": 11.461985194088465,
+      "volume": 0.01,
+      "sound_type": "bird",
+      "duration": 30.0
+    },
+    {
+      "index": 8,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Cinereous Tinamou30.mp3",
+      "position": [
+        29.73101755832187,
+        84.27445382574871,
+        41.855185966256336
+      ],
+      "distance": 98.68117127877737,
+      "azimuth": 19.43223117132533,
+      "elevation": 25.096595531546036,
+      "start_time": 21.80708823375783,
+      "volume": 0.01,
+      "sound_type": "bird",
+      "duration": 30.0
+    },
+    {
+      "index": 9,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Andean Guan15.mp3",
+      "position": [
+        -20.78899237243455,
+        -19.769491532891283,
+        14.793359810862961
+      ],
+      "distance": 32.27783285513229,
+      "azimuth": 226.43991568832203,
+      "elevation": 27.278320719344666,
+      "start_time": 15.523718713495715,
+      "volume": 0.020382363999598772,
+      "sound_type": "bird",
+      "duration": 22.7788125
+    },
+    {
+      "index": 10,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/wild_animals/Animal-Soundprepros/Aslan/lion15.wav",
+      "position": [
+        -139.82527192163835,
+        -22.993170238611537,
+        0.1132678072406802
+      ],
+      "distance": 141.7032299391162,
+      "azimuth": 260.6617322665531,
+      "elevation": 0.045798306809701726,
+      "start_time": 14.642338731789255,
+      "volume": 0.01,
+      "sound_type": "lion",
+      "duration": 2.043375
+    },
+    {
+      "index": 11,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Cinereous Tinamou30.mp3",
+      "position": [
+        0.8134404222717275,
+        22.105199496779544,
+        44.41137282541209
+      ],
+      "distance": 49.61523522418048,
+      "azimuth": 2.107453627655017,
+      "elevation": 63.52328672215546,
+      "start_time": 11.442228705334575,
+      "volume": 0.08638002468755898,
+      "sound_type": "bird",
+      "duration": 30.0
+    },
+    {
+      "index": 12,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Grey Tinamou15.mp3",
+      "position": [
+        76.19816996245113,
+        -56.03353002166774,
+        49.78102694627445
+      ],
+      "distance": 106.88343293579895,
+      "azimuth": 126.3294925511952,
+      "elevation": 27.758812791371614,
+      "start_time": 15.064224246077057,
+      "volume": 0.01,
+      "sound_type": "bird",
+      "duration": 5.9298125
+    },
+    {
+      "index": 13,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Cinereous Tinamou30.mp3",
+      "position": [
+        33.20550492291099,
+        68.96134049990685,
+        31.886785613152412
+      ],
+      "distance": 82.91585576636535,
+      "azimuth": 25.711232938568614,
+      "elevation": 22.616924389612812,
+      "start_time": 9.944764932238407,
+      "volume": 0.01,
+      "sound_type": "bird",
+      "duration": 30.0
+    },
+    {
+      "index": 14,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Cinereous Tinamou30.mp3",
+      "position": [
+        74.85877880000679,
+        36.835997035383365,
+        10.616291124567578
+      ],
+      "distance": 84.10370430760283,
+      "azimuth": 63.79943846791316,
+      "elevation": 7.25171022485989,
+      "start_time": 21.493315620097906,
+      "volume": 0.01,
+      "sound_type": "bird",
+      "duration": 30.0
+    },
+    {
+      "index": 15,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/wild_animals/Animal-Soundprepros/Aslan/lion30.wav",
+      "position": [
+        18.474602709330384,
+        -31.770645825622136,
+        1.540024662958234
+      ],
+      "distance": 36.783917102549566,
+      "azimuth": 149.8220363930334,
+      "elevation": 2.3994919030120183,
+      "start_time": 21.068796114254916,
+      "volume": 0.29043351780775734,
+      "sound_type": "lion",
+      "duration": 5.269375
+    },
+    {
+      "index": 16,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Tataupa Tinamou18.mp3",
+      "position": [
+        81.89495248079999,
+        -26.371583742045054,
+        35.016289648739004
+      ],
+      "distance": 92.88909630123747,
+      "azimuth": 107.84945173779857,
+      "elevation": 22.146048064759803,
+      "start_time": 6.560068863372362,
+      "volume": 0.01,
+      "sound_type": "bird",
+      "duration": 20.023
+    },
+    {
+      "index": 17,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Andean Guan15.mp3",
+      "position": [
+        10.555055887657002,
+        18.05382830878428,
+        30.87299538776359
+      ],
+      "distance": 37.2892982718567,
+      "azimuth": 30.312419733092792,
+      "elevation": 55.88686509841727,
+      "start_time": 7.274979529587672,
+      "volume": 0.0910992227665009,
+      "sound_type": "bird",
+      "duration": 22.7788125
+    },
+    {
+      "index": 18,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Marail Guan4.mp3",
+      "position": [
+        -4.4880862976597475,
+        -14.811723963581723,
+        21.51468266720823
+      ],
+      "distance": 26.50304993126739,
+      "azimuth": 196.85728307913854,
+      "elevation": 54.27034479375077,
+      "start_time": 14.391301069284737,
+      "volume": 0.09328863123890198,
+      "sound_type": "bird",
+      "duration": 30.0
+    },
+    {
+      "index": 19,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Cinereous Tinamou30.mp3",
+      "position": [
+        41.24946065042624,
+        -61.97453028627418,
+        37.43797489006947
+      ],
+      "distance": 83.33044084861696,
+      "azimuth": 146.3527680611046,
+      "elevation": 26.696940460647102,
+      "start_time": 6.860183898048381,
+      "volume": 0.01,
+      "sound_type": "bird",
+      "duration": 30.0
+    },
+    {
+      "index": 20,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Cinereous Tinamou30.mp3",
+      "position": [
+        29.560172830991036,
+        50.94415184219801,
+        5.413123113454359
+      ],
+      "distance": 59.147378019320534,
+      "azimuth": 30.124306184863133,
+      "elevation": 5.251013910687536,
+      "start_time": 0.20808394750543024,
+      "volume": 0.01,
+      "sound_type": "bird",
+      "duration": 30.0
+    },
+    {
+      "index": 21,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Cinereous Tinamou30.mp3",
+      "position": [
+        15.568461038285205,
+        -18.1992900502496,
+        17.96952429875608
+      ],
+      "distance": 29.94152536123208,
+      "azimuth": 139.45488720911976,
+      "elevation": 36.88092330350606,
+      "start_time": 8.89777270098123,
+      "volume": 0.027014526551614442,
+      "sound_type": "bird",
+      "duration": 30.0
+    },
+    {
+      "index": 22,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Andean Guan15.mp3",
+      "position": [
+        -69.76538217511958,
+        32.48785694862106,
+        44.09838977562831
+      ],
+      "distance": 88.69801226610322,
+      "azimuth": 294.97012564627835,
+      "elevation": 29.81324173174722,
+      "start_time": 8.945260820364561,
+      "volume": 0.01,
+      "sound_type": "bird",
+      "duration": 22.7788125
+    },
+    {
+      "index": 23,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/forest/audio/lion15.wav",
+      "position": [
+        45.74894902844125,
+        -8.181741506407636,
+        1.6521769867107747
+      ],
+      "distance": 46.50416024486418,
+      "azimuth": 100.13958279301902,
+      "elevation": 2.036004803031662,
+      "start_time": 1.4182302087086651,
+      "volume": 0.1327179525869705,
+      "sound_type": "lion",
+      "duration": 5.0
+    },
+    {
+      "index": 24,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Andean Guan15.mp3",
+      "position": [
+        -54.238766377087636,
+        6.92572617675372,
+        6.670338113731682
+      ],
+      "distance": 55.0845066396638,
+      "azimuth": 277.2766974865105,
+      "elevation": 6.955176370944442,
+      "start_time": 0.9320667438094649,
+      "volume": 0.01,
+      "sound_type": "bird",
+      "duration": 22.7788125
+    },
+    {
+      "index": 25,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/wild_animals/Animal-Soundprepros/Aslan/lion48.wav",
+      "position": [
+        14.475743393750001,
+        53.220990654400445,
+        2.936905324525222
+      ],
+      "distance": 55.232657060136994,
+      "azimuth": 15.21595976789928,
+      "elevation": 3.0480459495092336,
+      "start_time": 12.591680051851833,
+      "volume": 0.057862761384860295,
+      "sound_type": "lion",
+      "duration": 3.895875
+    },
+    {
+      "index": 26,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/forest/audio/lion58.wav",
+      "position": [
+        65.56263418899185,
+        -7.584044897810036,
+        2.511838268480939
+      ],
+      "distance": 66.04760457653681,
+      "azimuth": 96.59843851402638,
+      "elevation": 2.179525621838391,
+      "start_time": 22.035988939668538,
+      "volume": 0.018099376691775037,
+      "sound_type": "lion",
+      "duration": 5.0
+    },
+    {
+      "index": 27,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Tataupa Tinamou18.mp3",
+      "position": [
+        12.531968311400608,
+        31.82988953020021,
+        42.406599266812364
+      ],
+      "distance": 54.48405049772556,
+      "azimuth": 21.49040257305695,
+      "elevation": 51.107972371860576,
+      "start_time": 1.3443786284689092,
+      "volume": 0.01,
+      "sound_type": "bird",
+      "duration": 20.023
+    },
+    {
+      "index": 28,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/forest/audio/lion74.wav",
+      "position": [
+        -108.7629006336326,
+        66.29366435581882,
+        1.4338925247335794
+      ],
+      "distance": 127.38239492071064,
+      "azimuth": 301.36333556375627,
+      "elevation": 0.6449692291010515,
+      "start_time": 19.260929110839513,
+      "volume": 0.01,
+      "sound_type": "lion",
+      "duration": 5.0
+    },
+    {
+      "index": 29,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/wild_animals/Animal-Soundprepros/Aslan/lion15.wav",
+      "position": [
+        -101.97026530797082,
+        26.01935875978501,
+        1.6428137421704414
+      ],
+      "distance": 105.25037232352112,
+      "azimuth": 284.3144892995677,
+      "elevation": 0.8943447351246079,
+      "start_time": 22.771609992402876,
+      "volume": 0.01,
+      "sound_type": "lion",
+      "duration": 2.043375
+    },
+    {
+      "index": 30,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Andean Guan15.mp3",
+      "position": [
+        -49.90170361694482,
+        8.39558179500852,
+        41.389750956927934
+      ],
+      "distance": 65.37413327782328,
+      "azimuth": 279.5501418372403,
+      "elevation": 39.280777671697656,
+      "start_time": 5.37872691171647,
+      "volume": 0.01,
+      "sound_type": "bird",
+      "duration": 22.7788125
+    },
+    {
+      "index": 31,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Marail Guan4.mp3",
+      "position": [
+        69.84926412667556,
+        2.211295006401744,
+        37.142095464190156
+      ],
+      "distance": 79.14129630044253,
+      "azimuth": 88.18673008059945,
+      "elevation": 27.989757253470533,
+      "start_time": 12.792746705096059,
+      "volume": 0.01,
+      "sound_type": "bird",
+      "duration": 30.0
+    },
+    {
+      "index": 32,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Tataupa Tinamou18.mp3",
+      "position": [
+        -63.44281339110903,
+        -39.19674428078562,
+        39.18045538452989
+      ],
+      "distance": 84.24062806823986,
+      "azimuth": 238.29106804788552,
+      "elevation": 27.71680106995133,
+      "start_time": 3.2584142622273493,
+      "volume": 0.01,
+      "sound_type": "bird",
+      "duration": 20.023
+    },
+    {
+      "index": 33,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Andean Guan15.mp3",
+      "position": [
+        65.88849031784801,
+        -70.06554931494048,
+        27.695368735841633
+      ],
+      "distance": 100.08750075101156,
+      "azimuth": 136.7598049214653,
+      "elevation": 16.06403812394697,
+      "start_time": 13.383357466294443,
+      "volume": 0.01,
+      "sound_type": "bird",
+      "duration": 22.7788125
+    },
+    {
+      "index": 34,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Marail Guan4.mp3",
+      "position": [
+        68.32733742560328,
+        -70.21295831495316,
+        17.599869024500155
+      ],
+      "distance": 99.54014237828453,
+      "azimuth": 135.77978358251158,
+      "elevation": 10.184109353035302,
+      "start_time": 21.103804482271364,
+      "volume": 0.01,
+      "sound_type": "bird",
+      "duration": 30.0
+    },
+    {
+      "index": 35,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/forest/audio/lion17.wav",
+      "position": [
+        57.91401335661131,
+        13.11005392947605,
+        1.1389992293462836
+      ],
+      "distance": 59.39026668022274,
+      "azimuth": 77.24487031915739,
+      "elevation": 1.0988980769328065,
+      "start_time": 4.059413654485327,
+      "volume": 0.03120235964406648,
+      "sound_type": "lion",
+      "duration": 5.0
+    },
+    {
+      "index": 36,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/forest/audio/lion37.wav",
+      "position": [
+        -131.56682558092965,
+        39.263843580265835,
+        0.16824188478171942
+      ],
+      "distance": 137.30079137233747,
+      "azimuth": 286.6168239507963,
+      "elevation": 0.07020755125481618,
+      "start_time": 16.033435963804006,
+      "volume": 0.01,
+      "sound_type": "lion",
+      "duration": 5.0
+    },
+    {
+      "index": 37,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Grey Tinamou15.mp3",
+      "position": [
+        2.2305883430895697,
+        26.440874727351833,
+        15.10479677439297
+      ],
+      "distance": 30.532773642424825,
+      "azimuth": 4.8221324775659005,
+      "elevation": 29.650474464530856,
+      "start_time": 14.29030152107362,
+      "volume": 0.048815311500653685,
+      "sound_type": "bird",
+      "duration": 5.9298125
+    },
+    {
+      "index": 38,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Marail Guan4.mp3",
+      "position": [
+        33.39349209102245,
+        -43.58501888740329,
+        38.43694497523327
+      ],
+      "distance": 67.02371165846897,
+      "azimuth": 142.54178185894017,
+      "elevation": 34.993449955634105,
+      "start_time": 16.174136921760578,
+      "volume": 0.01,
+      "sound_type": "bird",
+      "duration": 30.0
+    },
+    {
+      "index": 39,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Andean Guan15.mp3",
+      "position": [
+        22.99701988093486,
+        -43.17770642282365,
+        45.57759941902379
+      ],
+      "distance": 66.86175905658374,
+      "azimuth": 151.9596423618254,
+      "elevation": 42.97421552363138,
+      "start_time": 5.990797993905295,
+      "volume": 0.01,
+      "sound_type": "bird",
+      "duration": 22.7788125
+    },
+    {
+      "index": 40,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Cinereous Tinamou30.mp3",
+      "position": [
+        -61.23212688970024,
+        50.2042853869572,
+        44.68648143774851
+      ],
+      "distance": 90.92153352170011,
+      "azimuth": 309.34836261636997,
+      "elevation": 29.438169115418123,
+      "start_time": 6.160603288186062,
+      "volume": 0.01,
+      "sound_type": "bird",
+      "duration": 30.0
+    },
+    {
+      "index": 41,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/wild_animals/Animal-Soundprepros/Aslan/lion48.wav",
+      "position": [
+        69.24307341116652,
+        89.38379586896062,
+        2.5194265486125915
+      ],
+      "distance": 113.09471114734795,
+      "azimuth": 37.76392116148156,
+      "elevation": 1.276491613882972,
+      "start_time": 20.66125183409106,
+      "volume": 0.01,
+      "sound_type": "lion",
+      "duration": 3.895875
+    },
+    {
+      "index": 42,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/birds_sample/Marail Guan4.mp3",
+      "position": [
+        19.63078187175377,
+        -9.055031462850177,
+        47.353657821520386
+      ],
+      "distance": 52.05506796429356,
+      "azimuth": 114.7623160483253,
+      "elevation": 65.46170688019812,
+      "start_time": 20.932567879632035,
+      "volume": 0.07053774053845854,
+      "sound_type": "bird",
+      "duration": 30.0
+    },
+    {
+      "index": 43,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/forest/audio/lion64.wav",
+      "position": [
+        65.61382404789593,
+        23.440829791380917,
+        0.4314382949700092
+      ],
+      "distance": 69.67662840938203,
+      "azimuth": 70.34050626687468,
+      "elevation": 0.3547782369978792,
+      "start_time": 16.050407342875207,
+      "volume": 0.014497011655055193,
+      "sound_type": "lion",
+      "duration": 5.0
+    },
+    {
+      "index": 44,
+      "audio_file": "/Users/abhinav/antamaya/wildsim-audio/audio_cache/forest/audio/lion49.wav",
+      "position": [
+        61.36033504996124,
+        -39.06800857057709,
+        2.9732361962861207
+      ],
+      "distance": 72.80274819395964,
+      "azimuth": 122.48482991046683,
+      "elevation": 2.340588510102158,
+      "start_time": 10.904394889531094,
+      "volume": 0.018676908396030173,
+      "sound_type": "lion",
+      "duration": 5.0
+    }
+  ]
+}

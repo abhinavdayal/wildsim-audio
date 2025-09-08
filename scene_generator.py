@@ -42,6 +42,12 @@ class GeneratorConfig:
     scene_duration: float = 30.0
     sample_rate: int = 16000
     output_dir: str = "outputs/generated_scenes"
+    
+    # New fields for enhanced control
+    dataset_name: str = "generated_dataset"  # Name for the dataset being created
+    allowed_ambient_types: Optional[List[str]] = None  # If None, use all available types
+    allowed_directional_types: Optional[List[str]] = None  # If None, use all available types
+    exclude_elephant_from_negatives: bool = True  # Prevent elephant sounds in negative samples
 
 class SceneGenerator:
     """Generates randomized elephant detection scenes"""
@@ -117,6 +123,9 @@ class SceneGenerator:
         
         # Cache available files by sound type
         self._build_sound_type_cache()
+        
+        # Validate and filter configured sound types
+        self._validate_sound_type_config()
     
     def _build_sound_type_cache(self):
         """Build cache of available audio files by sound type"""
@@ -136,11 +145,155 @@ class SceneGenerator:
         for sound_type, files in self.sound_cache.items():
             print(f"   - {sound_type}: {len(files)} files")
     
+    def _validate_sound_type_config(self):
+        """Validate and filter configured sound types against available files"""
+        available_types = set(self.sound_cache.keys())
+        
+        # Validate directional types
+        if self.config.allowed_directional_types:
+            invalid_directional = []
+            valid_directional = []
+            for sound_type in self.config.allowed_directional_types:
+                if sound_type.lower() in available_types:
+                    valid_directional.append(sound_type)
+                else:
+                    invalid_directional.append(sound_type)
+            
+            if invalid_directional:
+                print(f"⚠️  Invalid directional sound types (no files found): {invalid_directional}")
+            
+            if valid_directional:
+                self.config.allowed_directional_types = valid_directional
+                print(f"✅ Using {len(valid_directional)} configured directional types: {valid_directional}")
+            else:
+                print("⚠️  No valid directional types found in config, using defaults")
+                self.config.allowed_directional_types = None
+        
+        # Validate ambient types
+        if self.config.allowed_ambient_types:
+            invalid_ambient = []
+            valid_ambient = []
+            for sound_type in self.config.allowed_ambient_types:
+                if sound_type.lower() in available_types:
+                    valid_ambient.append(sound_type)
+                else:
+                    invalid_ambient.append(sound_type)
+            
+            if invalid_ambient:
+                print(f"⚠️  Invalid ambient sound types (no files found): {invalid_ambient}")
+            
+            if valid_ambient:
+                self.config.allowed_ambient_types = valid_ambient
+                print(f"✅ Using {len(valid_ambient)} configured ambient types: {valid_ambient}")
+            else:
+                print("⚠️  No valid ambient types found in config, using defaults")
+                self.config.allowed_ambient_types = None
+    
     def _get_physics_based_height(self, sound_type: str) -> float:
         """Get realistic height for a sound type based on physics"""
         constraints = self.HEIGHT_CONSTRAINTS.get(sound_type, self.HEIGHT_CONSTRAINTS["default"])
         min_height, max_height = constraints
         return random.uniform(min_height, max_height)
+    
+    def _calculate_realistic_volume(self, sound_type: str, distance: float) -> float:
+        """Calculate realistic volume based on sound type and distance using acoustic modeling"""
+        
+        # Base source power levels (dB SPL at 1m) for different sound types
+        # These are approximate real-world values
+        BASE_POWER_LEVELS = {
+            # Large animals - very loud natural calls
+            'elephant': 110,  # Elephant trumpets can reach 117 dB
+            'lion': 105,      # Lion roars around 110 dB
+            'bear': 100,      # Bear calls
+            'wolf': 100,      # Wolf howls
+            
+            # Medium animals
+            'monkey': 95,     # Primate calls
+            'dog': 90,        # Dog barks
+            'horse': 88,      # Horse neighs
+            'cow': 85,        # Cow moos
+            'sheep': 80,      # Sheep bleats
+            
+            # Birds - varies widely but generally quieter
+            'bird': 75,       # Average bird calls
+            'chicken': 70,    # Chicken clucks
+            
+            # Small animals
+            'cat': 65,        # Cat meows
+            'frog': 60,       # Frog croaks
+            
+            # Human activities
+            'speaking': 60,   # Normal speech
+            'clapping': 85,   # Hand clapping
+            'whistling': 70,  # Human whistling
+            'footsteps': 55,  # Footsteps on forest floor
+            
+            # Machinery/tools - very loud
+            'chainsaw': 110,  # Chainsaws are extremely loud
+            'helicopter': 105, # Helicopter noise
+            'vehicleengine': 95, # Vehicle engines
+            'generator': 90,   # Generators
+            'gunshot': 120,    # Gunshots are extremely loud
+            'firework': 115,   # Fireworks
+            'axe': 85,         # Axe chopping
+            'handsaw': 80,     # Hand sawing
+            'woodchop': 85,    # Wood chopping
+            
+            # Other sounds
+            'treefalling': 100, # Large tree falling
+            'wingflaping': 65,  # Wing flapping
+            'wolfhowl': 100,   # Wolf howls
+            'squirrel': 55,    # Squirrel chatter
+            'dolphin': 80,     # Dolphin clicks
+            'donkey': 85,      # Donkey brays
+        }
+        
+        # Get base power level for this sound type
+        base_db = BASE_POWER_LEVELS.get(sound_type, 75)  # Default 75 dB
+        
+        # Add random variation (±5 dB) to simulate natural variation
+        base_db += random.uniform(-5, 5)
+        
+        # Apply acoustic attenuation models for forest environment
+        attenuated_db = self._apply_forest_attenuation(base_db, distance)
+        
+        # Convert dB to linear volume scale (0.0 to ~5.0 range)
+        # Reference: 60 dB = volume 1.0 (easily audible)
+        reference_db = 60
+        volume = 10 ** ((attenuated_db - reference_db) / 20)
+        
+        # Clamp volume to reasonable range
+        volume = max(0.01, min(volume, 5.0))  # Minimum 0.01, maximum 5.0
+        
+        return volume
+    
+    def _apply_forest_attenuation(self, source_db: float, distance: float) -> float:
+        """Apply realistic acoustic attenuation for forest environment"""
+        
+        # Spherical spreading loss: -6 dB per doubling of distance
+        spreading_loss = 20 * math.log10(distance) if distance > 1.0 else 0
+        
+        # Atmospheric absorption (varies with frequency, humidity, temperature)
+        # For forest at ~20°C, 50% humidity, approximate broadband absorption
+        # 0.1 dB/m for low frequencies, 0.3 dB/m for high frequencies
+        atmospheric_loss = 0.2 * distance  # Average atmospheric absorption
+        
+        # Forest-specific attenuation due to vegetation
+        # Trees, leaves, and undergrowth scatter and absorb sound
+        # Approximately 0.1-0.5 dB/m depending on density
+        vegetation_loss = 0.3 * distance  # Moderate forest density
+        
+        # Ground effect - forest floor absorption
+        # Soft forest floor (leaves, soil) absorbs sound
+        ground_loss = 0.1 * distance
+        
+        # Total attenuation
+        total_loss = spreading_loss + atmospheric_loss + vegetation_loss + ground_loss
+        
+        # Apply attenuation
+        attenuated_db = source_db - total_loss
+        
+        return attenuated_db
     
     def _generate_random_position(self, sound_type: str, distance: float) -> Tuple[float, float, float]:
         """Generate random 3D position with physics-based height constraints"""
@@ -172,7 +325,12 @@ class SceneGenerator:
     def _generate_directional_sounds(self, num_sounds: int, exclude_elephant: bool = True) -> List[Dict]:
         """Generate random directional sounds"""
         sounds = []
-        available_types = list(self.DIRECTIONAL_TYPES)
+        
+        # Use configured types if available, otherwise fall back to defaults
+        if self.config.allowed_directional_types:
+            available_types = list(self.config.allowed_directional_types)
+        else:
+            available_types = list(self.DIRECTIONAL_TYPES)
         
         if exclude_elephant:
             available_types = [t for t in available_types if "elephant" not in t]
@@ -197,16 +355,9 @@ class SceneGenerator:
             
             # Random start time throughout the scene
             start_time = random.uniform(0.0, max(0.0, self.config.scene_duration - 5.0))
-            # Use higher base volumes for animal sounds
-            if sound_type in ['elephant', 'lion', 'bear', 'wolf']:
-                # Large animal calls are naturally loud
-                volume = random.uniform(1.2, 2.0)
-            elif sound_type in ['bird', 'monkey', 'dog', 'cat', 'chicken', 'horse', 'cow', 'sheep']:
-                # Other animals - good audible range
-                volume = random.uniform(0.8, 1.6)
-            else:
-                # Non-animal sounds - standard range
-                volume = random.uniform(0.6, 1.3)
+            
+            # Calculate distance-based volume with realistic acoustic attenuation
+            volume = self._calculate_realistic_volume(sound_type, distance)
             
             sound = {
                 "sound_type": sound_type,
@@ -225,7 +376,12 @@ class SceneGenerator:
     def _generate_ambient_sounds(self, num_sounds: int) -> List[Dict]:
         """Generate random ambient background sounds"""
         ambient_sounds = []
-        available_types = list(self.AMBIENT_TYPES)
+        
+        # Use configured types if available, otherwise fall back to defaults
+        if self.config.allowed_ambient_types:
+            available_types = list(self.config.allowed_ambient_types)
+        else:
+            available_types = list(self.AMBIENT_TYPES)
         
         for _ in range(num_sounds):
             ambient_type = random.choice(available_types)
@@ -516,11 +672,44 @@ def main():
     parser.add_argument("--min-distance", type=float, default=10.0, help="Minimum sound distance in meters")
     parser.add_argument("--max-distance", type=float, default=500.0, help="Maximum sound distance in meters")
     
+    # Sound type selection
+    parser.add_argument("--allowed-directional", nargs="*", help="Allowed directional sound types (space-separated)")
+    parser.add_argument("--allowed-ambient", nargs="*", help="Allowed ambient sound types (space-separated)")
+    parser.add_argument("--list-types", action="store_true", help="List all available sound types and exit")
+    
     args = parser.parse_args()
     
     # Initialize dataset manager
     print("🔍 Initializing dataset manager...")
     dataset_manager = DatasetManager()
+    
+    if args.list_types:
+        # List available sound types
+        print("\n📋 Available sound types in dataset:")
+        
+        # Build sound cache to see what's available
+        sound_cache = {}
+        for file_hash, file_info in dataset_manager.catalog.catalog["files"].items():
+            source_type = file_info.get("source_type", "unknown").lower()
+            if source_type not in sound_cache:
+                sound_cache[source_type] = 0
+            sound_cache[source_type] += 1
+        
+        # Sort by name for easy reading
+        for sound_type in sorted(sound_cache.keys()):
+            count = sound_cache[sound_type]
+            print(f"   - {sound_type}: {count} files")
+        
+        print(f"\n💡 Usage examples:")
+        print(f"   # Use only bird and lion sounds for directional:")
+        print(f"   python scene_generator.py --allowed-directional bird lion")
+        print(f"   # Use only rain for ambient:")
+        print(f"   python scene_generator.py --allowed-ambient rain")
+        print(f"   # Combine both:")
+        print(f"   python scene_generator.py --allowed-directional bird lion --allowed-ambient rain wind")
+        print(f"   # Generate with selected types:")
+        print(f"   python scene_generator.py --num-samples 10 --allowed-directional bird lion bear --allowed-ambient rain")
+        return
     
     if args.render:
         # Render mode
@@ -542,7 +731,9 @@ def main():
             min_distance=args.min_distance,
             max_distance=args.max_distance,
             scene_duration=args.duration,
-            output_dir=args.output_dir
+            output_dir=args.output_dir,
+            allowed_directional_types=args.allowed_directional,
+            allowed_ambient_types=args.allowed_ambient
         )
         
         generator = SceneGenerator(dataset_manager, config)

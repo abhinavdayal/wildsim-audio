@@ -51,6 +51,39 @@ class SimpleSimulator:
             duration = max_duration or 1.0
             return np.zeros(int(duration * target_sr))
     
+    def _apply_forest_filtering(self, audio: np.ndarray, distance: float, sample_rate: int) -> np.ndarray:
+        """Apply frequency-dependent attenuation for forest environment"""
+        try:
+            from scipy import signal
+        except ImportError:
+            print("Warning: scipy not available, skipping forest filtering")
+            return audio
+        
+        # Forest environments preferentially absorb high frequencies
+        # The farther the distance, the more high-frequency content is lost
+        
+        # Calculate cutoff frequency based on distance
+        # Closer sounds: preserve more highs, distant sounds: lose highs
+        base_cutoff = 8000  # Hz - upper limit for natural sounds
+        distance_factor = max(0.3, 1.0 - (distance - 20) / 200)  # Gradual rolloff
+        cutoff_freq = base_cutoff * distance_factor
+        
+        # Apply low-pass filtering for distant sounds
+        if cutoff_freq < base_cutoff * 0.9:  # Only filter if significant distance
+            # Design low-pass filter
+            nyquist = sample_rate / 2
+            normalized_cutoff = min(cutoff_freq / nyquist, 0.95)  # Prevent aliasing
+            
+            # Use 4th order Butterworth filter for smooth rolloff
+            b, a = signal.butter(4, normalized_cutoff, btype='low')
+            
+            # Apply filter
+            filtered_audio = signal.filtfilt(b, a, audio)
+            
+            return filtered_audio
+        
+        return audio
+    
     def select_audio_for_type(self, sound_type: str, dataset: str = None) -> str:
         """Select a random audio file matching the sound type"""
         matches = self.scene_builder.find_audio_by_type(sound_type, dataset)
@@ -116,6 +149,7 @@ class SimpleSimulator:
         print(f"  - Room size: {room_size[0]:.0f}x{room_size[1]:.0f}x{room_size[2]:.0f}m")
         print(f"  - Microphones at forest level: 2m above ground")
         print(f"  - Material absorption: 99% (open air)")
+        print(f"  - Distance-based attenuation: Applied in preprocessing")
         
         # Set forest-specific atmospheric conditions
         # Forest environments typically have:
@@ -162,6 +196,10 @@ class SimpleSimulator:
             
             # Apply volume scaling
             audio = audio * sound.volume
+            
+            # Apply forest-specific frequency filtering based on distance
+            if hasattr(sound, 'distance') and sound.distance > 20.0:
+                audio = self._apply_forest_filtering(audio, sound.distance, config.sample_rate)
             
             # Adjust sound position to room coordinates (center at room center)
             sound_position_centered = [

@@ -63,6 +63,13 @@ class SceneGeneratorUI:
         with col1:
             st.markdown("#### 📊 Dataset Configuration")
             
+            # Dataset naming
+            dataset_name = st.text_input(
+                "Dataset Name",
+                value="elephant_detection_dataset",
+                help="Name for this dataset - will be used for file naming"
+            )
+            
             num_samples = st.number_input(
                 "Number of Scenes",
                 min_value=1,
@@ -104,6 +111,99 @@ class SceneGeneratorUI:
                 max_ambient = st.number_input("Max Ambient Sounds", 1, 20, 5, key="max_amb")
                 max_distance = st.number_input("Max Distance (m)", 1.0, 1000.0, 500.0, key="max_dist")
         
+        # Sound type selection
+        st.markdown("#### 🎵 Sound Type Selection")
+        
+        col3a, col3b = st.columns([1, 1])
+        
+        with col3a:
+            st.markdown("**Directional Sound Types:**")
+            
+            # Get available directional sound types from the generator
+            directional_types = sorted(list(SceneGenerator.DIRECTIONAL_TYPES))
+            
+            # Add "Select All" / "Deselect All" buttons
+            col_all, col_none = st.columns([1, 1])
+            with col_all:
+                select_all_dir = st.button("✅ Select All", key="select_all_directional")
+            with col_none:
+                deselect_all_dir = st.button("❌ Deselect All", key="deselect_all_directional")
+            
+            # Initialize session state for directional types selection
+            if 'selected_directional_types' not in st.session_state:
+                st.session_state.selected_directional_types = directional_types.copy()
+            
+            # Handle select/deselect all buttons
+            if select_all_dir:
+                st.session_state.selected_directional_types = directional_types.copy()
+                st.rerun()
+            if deselect_all_dir:
+                st.session_state.selected_directional_types = []
+                st.rerun()
+            
+            # Scrollable container for directional sound types
+            with st.container(height=300):
+                selected_directional_types = []
+                for sound_type in directional_types:
+                    is_selected = st.checkbox(
+                        f"🎯 {sound_type.title()}",
+                        value=sound_type in st.session_state.selected_directional_types,
+                        key=f"dir_{sound_type}"
+                    )
+                    if is_selected:
+                        selected_directional_types.append(sound_type)
+                
+                # Update session state
+                st.session_state.selected_directional_types = selected_directional_types
+        
+        with col3b:
+            st.markdown("**Ambient Sound Types:**")
+            
+            # Get available ambient sound types from the generator
+            ambient_types = sorted(list(SceneGenerator.AMBIENT_TYPES))
+            
+            # Add "Select All" / "Deselect All" buttons
+            col_all_amb, col_none_amb = st.columns([1, 1])
+            with col_all_amb:
+                select_all_amb = st.button("✅ Select All", key="select_all_ambient")
+            with col_none_amb:
+                deselect_all_amb = st.button("❌ Deselect All", key="deselect_all_ambient")
+            
+            # Initialize session state for ambient types selection
+            if 'selected_ambient_types' not in st.session_state:
+                st.session_state.selected_ambient_types = ambient_types.copy()
+            
+            # Handle select/deselect all buttons
+            if select_all_amb:
+                st.session_state.selected_ambient_types = ambient_types.copy()
+                st.rerun()
+            if deselect_all_amb:
+                st.session_state.selected_ambient_types = []
+                st.rerun()
+            
+            # Scrollable container for ambient sound types
+            with st.container(height=300):
+                selected_ambient_types = []
+                for sound_type in ambient_types:
+                    is_selected = st.checkbox(
+                        f"🌿 {sound_type.title()}",
+                        value=sound_type in st.session_state.selected_ambient_types,
+                        key=f"amb_{sound_type}"
+                    )
+                    if is_selected:
+                        selected_ambient_types.append(sound_type)
+                
+                # Update session state
+                st.session_state.selected_ambient_types = selected_ambient_types
+        
+        # Show selection summary
+        st.markdown("#### 📊 Selection Summary")
+        col_summary1, col_summary2 = st.columns([1, 1])
+        with col_summary1:
+            st.info(f"**Selected Directional Types:** {len(st.session_state.selected_directional_types)} of {len(directional_types)}")
+        with col_summary2:
+            st.info(f"**Selected Ambient Types:** {len(st.session_state.selected_ambient_types)} of {len(ambient_types)}")
+        
         # Validation
         if min_directional > max_directional:
             st.error("Minimum directional sounds cannot be greater than maximum")
@@ -116,6 +216,13 @@ class SceneGeneratorUI:
         if min_distance > max_distance:
             st.error("Minimum distance cannot be greater than maximum distance")
             return
+        
+        if len(st.session_state.selected_directional_types) == 0:
+            st.error("Please select at least one directional sound type")
+            return
+        
+        if len(st.session_state.selected_ambient_types) == 0:
+            st.warning("No ambient sound types selected - scenes will have no background ambience")
         
         # Output configuration
         output_dir = st.text_input(
@@ -143,18 +250,22 @@ class SceneGeneratorUI:
         # Generation button
         if st.button("🚀 Generate Dataset", type="primary"):
             self._generate_scenes(
-                num_samples, positive_ratio, scene_duration,
+                dataset_name, num_samples, positive_ratio, scene_duration,
                 min_directional, max_directional, min_ambient, max_ambient,
-                min_distance, max_distance, output_dir
+                min_distance, max_distance, output_dir,
+                st.session_state.selected_directional_types,
+                st.session_state.selected_ambient_types
             )
     
-    def _generate_scenes(self, num_samples, positive_ratio, duration,
+    def _generate_scenes(self, dataset_name, num_samples, positive_ratio, duration,
                         min_dir, max_dir, min_amb, max_amb,
-                        min_dist, max_dist, output_dir):
+                        min_dist, max_dist, output_dir,
+                        selected_directional_types, selected_ambient_types):
         """Generate scenes with progress tracking"""
         
         with st.spinner("Initializing scene generator..."):
             config = GeneratorConfig(
+                dataset_name=dataset_name,
                 num_samples=num_samples,
                 positive_ratio=positive_ratio,
                 scene_duration=duration,
@@ -164,7 +275,9 @@ class SceneGeneratorUI:
                 max_ambient_sounds=max_amb,
                 min_distance=min_dist,
                 max_distance=max_dist,
-                output_dir=output_dir
+                output_dir=output_dir,
+                allowed_directional_types=selected_directional_types,
+                allowed_ambient_types=selected_ambient_types
             )
             
             generator = SceneGenerator(self.dataset_manager, config)
@@ -190,7 +303,7 @@ class SceneGeneratorUI:
             with col1:
                 st.markdown("#### 📁 Generated Files")
                 st.code(f"JSONL: {jsonl_path}")
-                st.code(f"Summary: {Path(jsonl_path).parent / f'summary_{num_samples}.json'}")
+                st.code(f"Summary: {Path(jsonl_path).parent / f'summary_{dataset_name}_{num_samples}.json'}")
             
             with col2:
                 st.markdown("#### 🎵 Next Steps")
