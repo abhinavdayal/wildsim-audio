@@ -315,12 +315,12 @@ class SimpleSimulator:
         
         # Save audio files
         for i in range(4):
-            mic_file = output_path / f"{scene_name}_mic_{i+1}.wav"
+            mic_file = output_path / f"mic_{i+1}.wav"
             sf.write(mic_file, mic_signals[i], metadata['sample_rate'])
         
         # Save metadata
         import json
-        metadata_file = output_path / f"{scene_name}_metadata.json"
+        metadata_file = output_path / f"metadata.json"
         with open(metadata_file, 'w') as f:
             json.dump(metadata, f, indent=2)
         

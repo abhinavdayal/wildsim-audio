@@ -518,8 +518,12 @@ class SceneGenerator:
         # Shuffle scenes
         random.shuffle(scenes)
         
-        # Save as JSONL
-        jsonl_path = self.output_dir / f"generated_scenes_{self.config.num_samples}.jsonl"
+        # Create dataset-specific output directory
+        dataset_output_dir = self.output_dir / self.config.dataset_name
+        dataset_output_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Save as JSONL in dataset-specific folder
+        jsonl_path = dataset_output_dir / f"generated_scenes_{self.config.num_samples}.jsonl"
         with open(jsonl_path, 'w') as f:
             for scene in scenes:
                 f.write(json.dumps(scene) + '\n')
@@ -527,7 +531,7 @@ class SceneGenerator:
         print(f"✅ Generated {len(scenes)} scenes saved to: {jsonl_path}")
         
         # Generate summary statistics
-        self._generate_summary(scenes, jsonl_path.parent / f"summary_{self.config.num_samples}.json")
+        self._generate_summary(scenes, dataset_output_dir / f"summary_{self.config.num_samples}.json")
         
         return str(jsonl_path)
     
@@ -582,6 +586,7 @@ class SceneRenderer:
             raise FileNotFoundError(f"JSONL file not found: {jsonl_path}")
         
         if output_dir is None:
+            # Create rendered_audio folder in the same dataset folder as the JSONL
             output_dir = jsonl_path.parent / "rendered_audio"
         
         output_dir = Path(output_dir)
@@ -654,13 +659,14 @@ def main():
     parser = argparse.ArgumentParser(description="Generate elephant detection scene configurations")
     
     # Generation parameters
+    parser.add_argument("--dataset-name", type=str, default="generated_dataset", help="Name for the dataset (used for folder naming)")
     parser.add_argument("--num-samples", type=int, default=100, help="Number of scenes to generate")
     parser.add_argument("--positive-ratio", type=float, default=0.5, help="Ratio of positive samples (0.0-1.0)")
     parser.add_argument("--min-directional", type=int, default=10, help="Minimum directional sounds per scene")
     parser.add_argument("--max-directional", type=int, default=50, help="Maximum directional sounds per scene")
     parser.add_argument("--min-ambient", type=int, default=3, help="Minimum ambient sounds per scene")
     parser.add_argument("--max-ambient", type=int, default=5, help="Maximum ambient sounds per scene")
-    parser.add_argument("--output-dir", type=str, default="generated_scenes", help="Output directory")
+    parser.add_argument("--output-dir", type=str, default="outputs/generated_scenes", help="Base output directory")
     
     # Execution options
     parser.add_argument("--render", action="store_true", help="Render audio from generated JSONL")
@@ -722,6 +728,7 @@ def main():
     else:
         # Generation mode
         config = GeneratorConfig(
+            dataset_name=args.dataset_name,
             num_samples=args.num_samples,
             positive_ratio=args.positive_ratio,
             min_directional_sounds=args.min_directional,

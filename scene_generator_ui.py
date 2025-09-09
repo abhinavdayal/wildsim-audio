@@ -303,7 +303,8 @@ class SceneGeneratorUI:
             with col1:
                 st.markdown("#### 📁 Generated Files")
                 st.code(f"JSONL: {jsonl_path}")
-                st.code(f"Summary: {Path(jsonl_path).parent / f'summary_{dataset_name}_{num_samples}.json'}")
+                summary_path = Path(jsonl_path).parent / f"summary_{num_samples}.json"
+                st.code(f"Summary: {summary_path}")
             
             with col2:
                 st.markdown("#### 🎵 Next Steps")
@@ -336,9 +337,13 @@ class SceneGeneratorUI:
                 recent_files = [st.session_state.last_generated_jsonl]
             
             # Find existing JSONL files
-            generated_dir = Path("generated_scenes")
-            if generated_dir.exists():
-                existing_files = list(generated_dir.glob("*.jsonl"))
+            outputs_dir = Path("outputs/generated_scenes")
+            if outputs_dir.exists():
+                existing_files = []
+                # Look for JSONL files in dataset subdirectories
+                for dataset_dir in outputs_dir.iterdir():
+                    if dataset_dir.is_dir():
+                        existing_files.extend(dataset_dir.glob("*.jsonl"))
                 recent_files.extend([str(f) for f in existing_files if str(f) not in recent_files])
             
             if recent_files:
@@ -665,7 +670,10 @@ class SceneGeneratorUI:
         available_files = []
         outputs_dir = Path("outputs/generated_scenes")
         if outputs_dir.exists():
-            available_files = list(outputs_dir.glob("*.jsonl"))
+            # Look for JSONL files in dataset subdirectories
+            for dataset_dir in outputs_dir.iterdir():
+                if dataset_dir.is_dir():
+                    available_files.extend(dataset_dir.glob("*.jsonl"))
         
         if not available_files:
             st.info("No scene files found. Generate scenes first in the 'Generate Scenes' tab.")
@@ -694,9 +702,12 @@ class SceneGeneratorUI:
         
         # File selection
         summary_files = []
-        generated_dir = Path("generated_scenes")
-        if generated_dir.exists():
-            summary_files = list(generated_dir.glob("summary_*.json"))
+        outputs_dir = Path("outputs/generated_scenes")
+        if outputs_dir.exists():
+            # Look for summary files in dataset subdirectories
+            for dataset_dir in outputs_dir.iterdir():
+                if dataset_dir.is_dir():
+                    summary_files.extend(dataset_dir.glob("summary_*.json"))
         
         if not summary_files:
             st.info("No summary statistics found. Generate a dataset first to see statistics.")
